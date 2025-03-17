@@ -554,7 +554,7 @@ def separate_peak_intensity(start_time_abs, t_fit, R_fit, intensity_interval):
         idx_peak = idx_peaks[-1]
 
         peakiD_Mag = iD_Mag[idx_peak]
-        peakiD_time_relative = iD_time[idx_peak] +1  # in minutes; add 1 min to offset zero indexing
+        peakiD_time_relative = iD_time[idx_peak]   # in minutes; add 1 min to offset zero indexing
 
         # MATLAB code adds: start_time_abs + (peakiD_time_relative/1400)
         # This seems to convert minutes to days using a factor ~ 1400 (normally 1440 minutes/day).
@@ -676,6 +676,8 @@ def separate_profile_plots(interval, tip_units, Peak_int, Peak_time, t_fit, R_fi
     ax2.set_ylabel('Cumulative Storm Rainfall, ' + tip_units, color='b')
     ax2.tick_params('y', colors='b')
     plt.title(fig_title, loc='left', fontsize=14)
+    ax1.set_ylim(0, max(y2) * 1.1)  # Ensures a little padding on top
+    ax2.set_ylim(0, max(y) * 1.1)  # Ensures a little padding on top
     plt.subplots_adjust(top=0.6)  # create extra white space for long title
 
     # plt.show()
