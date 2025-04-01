@@ -20,9 +20,11 @@ from scipy import stats
 # %% data analysis functions
 def rename_repeating_dates(dates):
     """
-    Rename repeating dates by appending a counter to the date.
+    Takes a list of dates and returns a new list with repeated dates suffixed with a counter (e.g. '2022-01-01_2')
+
     Args:
         dates (list): A list of dates.
+
     Returns:
         list: A list of renamed dates.
     """
@@ -31,7 +33,6 @@ def rename_repeating_dates(dates):
     renamed_dates = []  # Initialize an empty list to store the renamed dates
 
     # Iterate over the dates and count occurrences
-    #todo: make date names with no hyphen
     for date in dates:
         date_counts[date] += 1  # Increment the count for the current date
         count = date_counts[date]  # Get the current count
@@ -47,17 +48,21 @@ def rename_repeating_dates(dates):
 
 def separate_preprocessing(filename, sheetname, tip_type, tip_mag):
     """
-    Loads data from an Excel file (.xlsx or .csv) and prepares inputs for analysis.
+    Loads tip data from an Excel file (.xlsx or .csv) and preprocesses it for analysis.
 
-    Parameters:
-      filename: path to the Excel file.
-      sheetname: sheet name or 'none' if using the default.
-      tip_type: either 'fixed interval' or 'cumulative tips' (case insensitive).
-      tip_mag: tip magnitude in mm.
+    Args:
+        filename (str): Path to the Excel file.
+        sheetname (str, optional): Sheet name or 'none' if using the default. Defaults to None.
+        tip_type (str, optional): Type of tip data ('fixed interval' or 'cumulative tips'). Defaults to None.
+        tip_mag (float, optional): Tip magnitude in mm. Defaults to None.
 
     Returns:
-      tip_datetime: a Pandas Series of datetime objects.
-      tip_depth: a NumPy array of tip depth values.
+    tuple:
+        - tip_datetime (pd.Series): A Pandas Series of datetime objects representing the timestamps of the tip data.
+        - tip_depth (np.ndarray): A NumPy array of tip depth values.
+        - logging_interval (float): The logging interval of the tip data (only applicable for 'fixed interval' tip type).
+        - start_date (datetime.date): The start date of the tip data record.
+        - end_date (datetime.date): The end date of the tip data record.
     """
 
     # Split the filename into name and extension
@@ -129,20 +134,26 @@ def separate_ISC(tip_datetime, tip_depth, isc_t_max, min_depth, min_duration,
                            gap_plots_path, output_name, plt_ext):
     """
     Computes the optimal inter-event time (MIT) from tipping cup data using the coefficient of variation (CV) method.
-    Parameters:
-      tip_datetime: Pandas Series or array of datetime objects for each tip.
-      tip_depth: NumPy array of tip depth values.
-      isc_time: Maximum inter-event test interval (hours) for ISC (e.g., 48).
-      min_mag: Minimum storm magnitude (tip units); use None or [] if not specified.
-      min_duration: Minimum storm duration (hours); use None or [] if not specified.
-      gap_plots_path: Path to save ISC analysis plots.
-      output_name: Output name prefix for plots.
-      plt_ext: Plot file extension (e.g., '.png').
+
+    Args:
+        tip_datetime (pd.Series): Pandas Series of datetime objects for each tip.
+        tip_depth (np.ndarray): NumPy array of tip depth values.
+        isc_t_max (float): Maximum inter-event test interval (hours) for ISC.
+        min_depth (float): Minimum storm magnitude (tip units).
+        min_duration (float): Minimum storm duration (hours).
+        gap_plots_path (str): Path to save ISC analysis plots.
+        output_name (str): Output name prefix for plots.
+        plt_ext (str): Plot file extension (e.g., '.png').
 
     Returns:
-      tb0: The optimal Minimum Inter-Event Time (MIT) computed by interpolation.
+        tuple: A tuple containing the computed Minimum Inter-Event Time (MIT) and other intermediate results, including:
+            - tb0 (float): The optimal Minimum Inter-Event Time (MIT) computed by interpolation.
+            - CV_IET (np.ndarray): The coefficient of variation (CV) of the inter-event times.
+            - mean_IET (np.ndarray): The mean of the inter-event times.
+            - std_IET (np.ndarray): The standard deviation of the inter-event times.
+            - ISC_testintervals (np.ndarray): The tested inter-event intervals.
+            - StormNumsRec (np.ndarray): The number of included and suppressed storms for each test interval.
     """
-
     # Create test intervals: 0.1 to 0.9 in steps of 0.1, then 1 to isc_time in steps of 1 (inclusive)
     if isc_t_max < 1:
         ISC_testintervals = np.arange(0.1, isc_t_max, 0.1)
@@ -207,6 +218,7 @@ def separate_ISC(tip_datetime, tip_depth, isc_t_max, min_depth, min_duration,
         mean_tb = f_mean(tb0)
 
         #------------------ Plotting Section ------------------
+        # Plot IET statistics
         fig, axs = plt.subplots(1, 2, figsize=(12, 4))
         axs[0].plot(ISC_testintervals, 1 / mean_IET, 'r-', linewidth=1, label='Mean of Time Between Storms')
         axs[0].plot(ISC_testintervals, 1 / std_IET, 'b-', linewidth=1, label='Std Dev of Time Between Storms')
@@ -240,6 +252,7 @@ def separate_ISC(tip_datetime, tip_depth, isc_t_max, min_depth, min_duration,
         plt.savefig(plot_fid)
         plt.close(fig)
 
+        # plot up the number of storms included and suppressed
         fig2, ax2 = plt.subplots(figsize=(8, 6))
         frac_included = StormNumsRec[:, 0] / (StormNumsRec[:, 0] + StormNumsRec[:, 1])
         frac_suppressed = StormNumsRec[:, 1] / (StormNumsRec[:, 0] + StormNumsRec[:, 1])
@@ -262,24 +275,21 @@ def separate_storms(tip_datetime, tip_depth, test_interval):
     """
     Identify breaks in storms and generate storm records.
 
-    Parameters:
-      tip_datetime : list or array-like of datetime objects
-         Tip timestamps.
-      tip_depth : numpy array of numeric tip values
-         Tip magnitudes.
-      test_interval : float
-         Test interval in hours; if the time difference between consecutive tips exceeds this,
-         a storm break is assumed.
+    Args:
+        tip_datetime (list): List of datetime objects representing tip timestamps.
+        tip_depth (np.ndarray): NumPy array of numeric tip values representing tip magnitudes.
+        test_interval (float): Test interval in hours; if the time difference between consecutive tips exceeds this, a storm break is assumed.
 
     Returns:
-      storms : list of dictionaries, where each dictionary contains:
-          'indices': list of indices for tips in the storm,
-          'start': storm start datetime,
-          'end': storm end datetime,
-          'duration': storm duration in hours,
-          'magnitude': storm magnitude (sum of tip_depth),
-          'intensity_avg': average intensity (magnitude/duration)
-      interevent_times : numpy array of inter-event times (hours) corresponding to the dt that exceeded test_interval.
+        tuple: A tuple containing:
+            - storms (list): List of dictionaries, where each dictionary contains:
+                - 'indices': List of indices for tips in the storm.
+                - 'start': Storm start datetime.
+                - 'end': Storm end datetime.
+                - 'duration': Storm duration in hours.
+                - 'magnitude': Storm magnitude (sum of tip_depth).
+                - 'intensity_avg': Average intensity (magnitude/duration)
+            - interevent_times (np.ndarray): NumPy array of inter-event times (hours) corresponding to the time differences that exceeded the test_interval.
     """
     storms = []
     interevent_times = []
@@ -328,26 +338,36 @@ def separate_storms(tip_datetime, tip_depth, test_interval):
 
 def build_storm_record(tip_datetime, tip_depth, indices):
     """
-    Given a list of indices for a storm, compute and return a dictionary
-    with storm metrics.
+    Given a list of indices for a storm, compute and return a dictionary with storm metrics.
 
-    Parameters:
-      tip_datetime: list/array of datetime objects.
-      tip_depth: numpy array of numeric tip values.
-      indices: list of indices corresponding to the current storm.
+    Args:
+        tip_datetime (list): List of datetime objects representing tip timestamps.
+        tip_depth (np.ndarray): NumPy array of numeric tip values representing tip magnitudes.
+        indices (list): List of indices corresponding to the current storm.
 
     Returns:
-      A dictionary with keys:
-         'indices', 'start', 'end', 'duration', 'magnitude', 'intensity_avg'
+        dict: A dictionary with storm metrics, including:
+            - 'indices': List of indices for tips in the storm.
+            - 'start': Storm start datetime.
+            - 'end': Storm end datetime.
+            - 'duration': Storm duration in hours.
+            - 'magnitude': Storm magnitude (sum of tip_depth).
+            - 'intensity_avg': Average intensity (magnitude/duration).
     """
     # Ensure indices is not empty.
     if not indices:
         return None
+    # get start time
     start_datetime = tip_datetime[indices[0]]
+    # get end time
     end_datetime = tip_datetime[indices[-1]]
+    # compute duration
     duration = (end_datetime - start_datetime).total_seconds() / 3600.0
+    # compute magnitude
     magnitude = np.sum(tip_depth[indices])
+    # compute intensity
     intensity_avg = magnitude / duration if duration != 0 else np.nan
+    # return values in a dictionary
     return {
         'indices': indices.copy(),
         'start': start_datetime,
@@ -359,6 +379,23 @@ def build_storm_record(tip_datetime, tip_depth, indices):
 
 
 def separate_filter(storm_data, interevent_times, min_mag, min_dur):
+    """
+    Filter storm data based on minimum magnitude and duration criteria.
+
+    Args:
+        storm_data (list): List of dictionaries containing storm data.
+        interevent_times (np.ndarray): NumPy array of inter-event times.
+        min_mag (float): Minimum magnitude threshold (optional).
+        min_dur (float): Minimum duration threshold (optional).
+
+    Returns:
+        tuple: A tuple containing:
+            - storm_data (list): Filtered list of storm data dictionaries.
+            - interevent_times (np.ndarray): Updated NumPy array of inter-event times.
+            - N_nofilter (int): Number of storms before filtering.
+            - N_suppressed (int): Number of storms suppressed by filtering.
+    """
+
     N_nofilter = len(storm_data)
     flag_idx = []  # indices of storms to suppress
 
@@ -430,27 +467,24 @@ def separate_profiler(StormIDX, storm_data, tip_datetime, tip_depth, int_min):
     """
     Python version of the MATLAB SEPARATE_PROFILER function.
 
-    Parameters:
-      StormIDX : int
-         Storm index (0-based) to process.
-      storm_data : list of dicts
-         Each dict must contain at least:
-             'indices': list/array of tip indices for the storm
-             'start': absolute start datetime of the storm
-             'duration': storm duration in hours (float)
-      tip_datetime : list/array of datetime objects
-         Global tip timestamps.
-      tip_depth : numpy array of numeric tip values.
-      int_min : int
-         Intensity interval (in minutes).
+    Args:
+        StormIDX (int): Storm index (0-based) to process.
+        storm_data (list): List of dictionaries containing storm data.
+        tip_datetime (list): Global tip timestamps.
+        tip_depth (np.ndarray): NumPy array of numeric tip values.
+        int_min (int): Intensity interval (in minutes).
 
     Returns:
-      iD_Mag : numpy array of calculated intensities (tip units per hour) for each window.
-      iD_time : numpy array of corresponding times (in minutes, taken as the index in t_fit).
-      R_fit : numpy array of interpolated cumulative rainfall (tip units).
-      t_fit : numpy array of time values (in minutes) for interpolation.
+        tuple: A tuple containing:
+            - iD_Mag (np.ndarray): Calculated intensities (tip units per hour) for each window.
+            - iD_time (np.ndarray): Corresponding times (in minutes) for intensities.
+            - R_fit (np.ndarray): Interpolated cumulative rainfall (tip units).
+            - t_fit (np.ndarray): Time values (in minutes) for interpolation.
+            - tip_idx (list): Tip indices for the specified storm.
+            - cum_rain (np.ndarray): Cumulative rainfall for the storm.
+            - duration_min (int): Storm duration in minutes (floor value).
 
-      If there are insufficient tips (<= 2), returns (None, None, None, None).
+        If there are insufficient tips (<= 2), returns (None, None, None, None, None, None, None).
     """
     # Extract the tip indices for the specified storm.
     tip_idx = storm_data[StormIDX]['indices']
@@ -505,28 +539,23 @@ def separate_profiler(StormIDX, storm_data, tip_datetime, tip_depth, int_min):
 
 
 def separate_peak_intensity(start_time_abs, t_fit, R_fit, intensity_interval):
-
     """
     Calculate the peak intensity (iD_Mag) and corresponding time for a given storm profile.
 
-    Parameters:
-      start_time_abs : datetime object
-         The absolute start time of the storm.
-      t_fit : numpy array
-         Time vector (in minutes) from interpolation.
-      R_fit : numpy array
-         Interpolated cumulative rainfall values.
-      intensity_interval : int or float
-         The intensity interval in minutes.
+    Args:
+        start_time_abs (datetime): The absolute start time of the storm.
+        t_fit (np.ndarray): Time vector (in minutes) from interpolation.
+        R_fit (np.ndarray): Interpolated cumulative rainfall values.
+        intensity_interval (Union[int, float]): The intensity interval in minutes.
 
     Returns:
-      A tuple: (intensity_interval, peakiD_Mag, peakiD_datetime, peakiD_time_relative)
-        intensity_interval : same as input.
-        peakiD_Mag : the peak intensity (tip units per hour).
-        peakiD_datetime : datetime corresponding to the peak intensity.
-        peakiD_time_relative : relative time (in minutes) at which the peak occurs.
+        tuple: A tuple containing:
+            - intensity_interval (Union[int, float]): Same as input.
+            - peakiD_Mag (float): The peak intensity (tip units per hour).
+            - peakiD_datetime (datetime): Datetime corresponding to the peak intensity.
+            - peakiD_time_relative (float): Relative time (in minutes) at which the peak occurs.
 
-      If max(t_fit) is not greater than intensity_interval, returns (intensity_interval, np.nan, np.nan, np.nan).
+        If max(t_fit) is not greater than intensity_interval, returns (intensity_interval, np.nan, np.nan, np.nan).
     """
     # Check if t_fit is None; if so, return default values.
     # print(intensity_interval)
@@ -570,32 +599,22 @@ def separate_peak_intensity(start_time_abs, t_fit, R_fit, intensity_interval):
 
 def output_fitting_parameters_to_file(software_metadata, user_parameters, gap_CV, gap_mean,gap_std, stormgap_array,
                                       StormNumsRec,  output_name, gap_plots_path):
-    # user_parameters=header_parameters
     """
     Outputs the fitting parameters from the independence criterion method to an Excel file.
 
-    Parameters
-    ----------
-    software_metadata : list
-        List of strings containing the software version information.
-    user_parameters : dict
-        Dictionary of user provided parameters.
-    beta : float
-        The beta parameter from the exponential fit of the inter-event times.
-    mean_tb : float
-        The mean time between events.
-    gap_CV : float
-        The coefficient of variation of the time between events.
-    stormgap_array : array
-        Array of storm gap values from the optimization.
-    output_name : str
-        The name of the output file.
-    gap_plots_path : str
-        The path to the folder where the plots will be saved.
+    Args:
+        software_metadata (list): List of strings containing the software version information.
+        user_parameters (dict): Dictionary of user provided parameters.
+        gap_CV (float): The coefficient of variation of the time between events.
+        gap_mean (float): The mean time between events.
+        gap_std (float): The standard deviation of the time between events.
+        stormgap_array (np.ndarray): Array of storm gap values from the optimization.
+        StormNumsRec (np.ndarray): Array of storm numbers and suppressed storms.
+        output_name (str): The name of the output file.
+        gap_plots_path (str): The path to the folder where the plots will be saved.
 
-    Returns
-    -------
-    None
+    Returns:
+        None
     """
     software_metadata_df = pd.DataFrame({'Software Metadata': software_metadata})
     # user inputs
@@ -648,22 +667,42 @@ def output_fitting_parameters_to_file(software_metadata, user_parameters, gap_CV
 
 def separate_profile_plots(interval, tip_units, Peak_int, Peak_time, t_fit, R_fit, tip_idx, iD_time, iD_Mag,
                            fig_title, output_folder, storm_id_name, plt_ext):
+    """
+       Creates a plot of the cumulative rainfall and peak intensity for a given storm profile.
 
-    x = t_fit/60
-    y = R_fit
+       Args:
+           interval (int): The time interval for the intensity calculation.
+           tip_units (str): The units of the tip values.
+           Peak_int (float): The peak intensity value.
+           Peak_time (float): The time of the peak intensity.
+           t_fit (np.ndarray): The time values for the cumulative rainfall plot.
+           R_fit (np.ndarray): The cumulative rainfall values.
+           tip_idx (np.ndarray): The indices of the tip values.
+           iD_time (np.ndarray): The time values for the intensity plot.
+           iD_Mag (np.ndarray): The intensity values.
+           fig_title (str): The title of the plot.
+           output_folder (str): The folder where the plot will be saved.
+           storm_id_name (str): The name of the storm ID.
+           plt_ext (str): The file extension for the plot.
 
-    x2=iD_time/60
-    y2=iD_Mag
+       Returns:
+           None
+   """
+    x = t_fit/60 # convert to hours
+    y = R_fit # cumulative rainfall
+
+    x2=iD_time/60 # convert to hours
+    y2=iD_Mag # rainfall intensity
 
     # this shouldn't happen but if the peak intensity is negative, set it to nan
     if Peak_int<0:
         Peak_int=np.nan
 
-
+    # plot up cumulative rainfall and peak intensity
     fig, ax1 = plt.subplots()
     ax2 = ax1.twinx()
     ax1.plot(x2,y2, 'r-')
-    ax1.plot(Peak_time/60, Peak_int, 'ro')
+    ax1.plot(Peak_time/60, Peak_int, 'ro') # plot peak as a red dot
 
     ax1.set_ylabel(f'{int(interval)}-minute Intensity, ' + tip_units + r'/hr', color='r')
     ax1.tick_params('y', colors='r')
@@ -694,24 +733,26 @@ def separate_outputs(output, storm_profiles, storm_raw_profiles, tip_units, I_in
     Create final output spreadsheets and summary plots.
 
     Parameters:
-      output : list of dictionaries containing basic storm parameters and peak intensities.
-      storm_profiles : dict, keys = unique storm names, values = profile data dictionary.
-      storm_raw_profiles : dict, keys = unique storm names, values = raw profile data dictionary.
-      tip_units : str, units for tipping data.
-      I_intervals : array-like, intensity intervals in hours.
-      data_opt : bool, whether to output detailed storm profile data.
-      header_parameters : dict, header parameters.
-      output_path : str, folder path for output.
-      output_name : str, base output file name.
-      plt_ext : str, file extension for plots (e.g. '.png').
-      plot_start_date : str or None.
-      plot_end_date : str or None.
-      software_metadata : list of strings.
+    output (list[dict]): List of dictionaries containing basic storm parameters and peak intensities.
+    storm_profiles (dict): Dictionary of storm profiles, where each key is a unique storm name and each value is a profile data dictionary.
+    storm_raw_profiles (dict): Dictionary of raw storm profiles, where each key is a unique storm name and each value is a raw profile data dictionary.
+    tip_units (str): Units for tipping data.
+    I_intervals (list): List of intensity intervals in hours.
+    data_opt (bool): Whether to output detailed storm profile data.
+    header_parameters (dict): Dictionary of header parameters.
+    output_path (str): Folder path for output.
+    output_name (str): Base output file name.
+    plot_int (str): Plot interval.
+    plt_ext (str): File extension for plots (e.g. '.png').
+    plot_start_date (str): Start date for plotting (optional).
+    plot_end_date (str): End date for plotting (optional).
+    software_metadata (list[str]): List of software metadata strings.
+    columns (list[str]): List of column names.
+    units (list[str]): List of units.
 
     Returns:
-      errmsg : error message (if any) or None.
+    str: Error message (if any) or None.
     """
-
     output_headers = pd.DataFrame([units], columns=columns)
 
     # Convert date fields to datetime and then format as strings.
@@ -751,7 +792,6 @@ def separate_outputs(output, storm_profiles, storm_raw_profiles, tip_units, I_in
             if data_opt:
                 for storm_name, profile_data in storm_profiles.items():
                     # Create a DataFrame for interpolated (profile) data.
-                    # We assume profile_data is a dict containing keys like
                     # 'Cumulative Storm Time (hours)', 'Intensity Profile (mm/hr)', and 'Storm Metadata'
                     df_profile = pd.DataFrame({
                         'Cumulative Storm Time (hours)': profile_data.get('Cumulative Storm Time (hours)', []),
@@ -779,7 +819,7 @@ def separate_outputs(output, storm_profiles, storm_raw_profiles, tip_units, I_in
         sg.popup_error(errmsg, title='Error', text_color='black', background_color='white',
                        button_color=('black', 'lightblue'))
 
-    # Build summary plots (example: histogram of storm durations, magnitudes, and intensities)
+    # Build summary plots (histograms of storm durations, magnitudes, and intensities)
     plt.figure(figsize=(8, 3))
     plt.subplot(1, 3, 1)
     data_to_plot = output['Duration']
@@ -843,6 +883,7 @@ def separate_outputs(output, storm_profiles, storm_raw_profiles, tip_units, I_in
         num_dates = data_len
     else:
         num_dates = 10  # Set to the number of intervals you want between start_date and end_date
+
     # step_size = (end_date - start_date).days // (num_dates - 1)  # Calculate the step size
     # # get date series to plot
     # dates = [start_date + timedelta(days=i * step_size) for i in range(num_dates)]
@@ -898,8 +939,7 @@ def separate_outputs(output, storm_profiles, storm_raw_profiles, tip_units, I_in
     sum_plot_path3 = os.path.join(output_path, sum_plot_name3)
     plt.savefig(sum_plot_path3)
 
-    # subsampled time series
-    # reducing number of labels on x-axis
+    # sub-sampled time series
     if plot_end_date or plot_start_date:
         if plot_end_date:
             end_date = datetime.strptime(plot_end_date, '%Y-%m-%d').date()
@@ -978,74 +1018,74 @@ def separate_outputs(output, storm_profiles, storm_raw_profiles, tip_units, I_in
 
 
 
-def separate_filterold(storm_data, interevent_times, min_mag, min_dur):
-    N_nofilter = len(storm_data)
-    flag_idx = []  # indices of storms to suppress
-
-    # Build flag indices based on the criteria.
-    for i, storm in enumerate(storm_data):
-        duration = storm['duration']
-        magnitude = storm['magnitude']
-        # Apply filtering logic
-        if min_dur is not None and min_mag is not None:
-            if duration > min_dur and magnitude > min_mag:
-                continue
-            else:
-                flag_idx.append(i)
-
-        elif min_mag is not None and min_dur is None:
-            if magnitude > min_mag:
-                continue
-            else:
-                flag_idx.append(i)
-
-        elif min_dur is not None and min_mag is None:
-            if duration > min_dur:
-                continue
-            else:
-                flag_idx.append(i)
-
-    N_suppressed = len(flag_idx)
-
-    # If flag_idx has values, proceed with filtering
-    if flag_idx:
-        # Remove storms from storm_data
-        storm_data = [storm for i, storm in enumerate(storm_data) if i not in flag_idx]
-
-        # Handling interevent_times updates
-        if flag_idx[-1] == N_nofilter - 1 and len(flag_idx) > 1:
-            # Case where last storm is removed and previous values are sequential
-            initial_idx = len(flag_idx) - 1
-            indices2remove = [initial_idx]
-            while initial_idx > 0 and flag_idx[initial_idx] - flag_idx[initial_idx - 1] == 1:
-                initial_idx -= 1
-                indices2remove.append(initial_idx)
-
-            interevent_times = np.delete(interevent_times, indices2remove)
-            flag_idx = flag_idx[:-len(indices2remove)]
-
-        elif flag_idx[-1] == N_nofilter - 1 and len(flag_idx) == 1:
-            interevent_times = np.delete(interevent_times, -1)  # Remove last row
-            flag_idx= np.delete(flag_idx, -1)  # Trim last index for storm
-
-        if flag_idx:  # Verify still exists after trimming
-            if flag_idx[0] == 0:
-                flag_idx=flag_idx[1:]
-                if len(flag_idx) > 0:  # Ensure we have more flagged storms to process
-                    # Add IET to next storm's interevent time
-                    interevent_times[flag_idx[0] - 1] += interevent_times[flag_idx[0]]
-                    interevent_times = np.delete(interevent_times, flag_idx[0])  # Remove the flagged interevent time
-                    interevent_times = np.delete(interevent_times, 0)  # Remove first IET
-                    # interevent_times[flag_idx - 1] += interevent_times[flag_idx]  # Add IET preceding removed storms
-                    interevent_times = np.delete(interevent_times, flag_idx)  # Remove flagged interevent times
-                #
-                interevent_times = np.delete(interevent_times, 0)  # Remove first IET
-            else:
-                for idx in flag_idx:
-                    interevent_times[idx - 1] += interevent_times[idx]
-                # Now, delete all flagged indices AT ONCE to avoid shifting issues
-                interevent_times = np.delete(interevent_times, flag_idx)
-
-
-    return storm_data, interevent_times, N_nofilter, N_suppressed
-
+# def separate_filterold(storm_data, interevent_times, min_mag, min_dur):
+#     N_nofilter = len(storm_data)
+#     flag_idx = []  # indices of storms to suppress
+#
+#     # Build flag indices based on the criteria.
+#     for i, storm in enumerate(storm_data):
+#         duration = storm['duration']
+#         magnitude = storm['magnitude']
+#         # Apply filtering logic
+#         if min_dur is not None and min_mag is not None:
+#             if duration > min_dur and magnitude > min_mag:
+#                 continue
+#             else:
+#                 flag_idx.append(i)
+#
+#         elif min_mag is not None and min_dur is None:
+#             if magnitude > min_mag:
+#                 continue
+#             else:
+#                 flag_idx.append(i)
+#
+#         elif min_dur is not None and min_mag is None:
+#             if duration > min_dur:
+#                 continue
+#             else:
+#                 flag_idx.append(i)
+#
+#     N_suppressed = len(flag_idx)
+#
+#     # If flag_idx has values, proceed with filtering
+#     if flag_idx:
+#         # Remove storms from storm_data
+#         storm_data = [storm for i, storm in enumerate(storm_data) if i not in flag_idx]
+#
+#         # Handling interevent_times updates
+#         if flag_idx[-1] == N_nofilter - 1 and len(flag_idx) > 1:
+#             # Case where last storm is removed and previous values are sequential
+#             initial_idx = len(flag_idx) - 1
+#             indices2remove = [initial_idx]
+#             while initial_idx > 0 and flag_idx[initial_idx] - flag_idx[initial_idx - 1] == 1:
+#                 initial_idx -= 1
+#                 indices2remove.append(initial_idx)
+#
+#             interevent_times = np.delete(interevent_times, indices2remove)
+#             flag_idx = flag_idx[:-len(indices2remove)]
+#
+#         elif flag_idx[-1] == N_nofilter - 1 and len(flag_idx) == 1:
+#             interevent_times = np.delete(interevent_times, -1)  # Remove last row
+#             flag_idx= np.delete(flag_idx, -1)  # Trim last index for storm
+#
+#         if flag_idx:  # Verify still exists after trimming
+#             if flag_idx[0] == 0:
+#                 flag_idx=flag_idx[1:]
+#                 if len(flag_idx) > 0:  # Ensure we have more flagged storms to process
+#                     # Add IET to next storm's interevent time
+#                     interevent_times[flag_idx[0] - 1] += interevent_times[flag_idx[0]]
+#                     interevent_times = np.delete(interevent_times, flag_idx[0])  # Remove the flagged interevent time
+#                     interevent_times = np.delete(interevent_times, 0)  # Remove first IET
+#                     # interevent_times[flag_idx - 1] += interevent_times[flag_idx]  # Add IET preceding removed storms
+#                     interevent_times = np.delete(interevent_times, flag_idx)  # Remove flagged interevent times
+#                 #
+#                 interevent_times = np.delete(interevent_times, 0)  # Remove first IET
+#             else:
+#                 for idx in flag_idx:
+#                     interevent_times[idx - 1] += interevent_times[idx]
+#                 # Now, delete all flagged indices AT ONCE to avoid shifting issues
+#                 interevent_times = np.delete(interevent_times, flag_idx)
+#
+#
+#     return storm_data, interevent_times, N_nofilter, N_suppressed
+#

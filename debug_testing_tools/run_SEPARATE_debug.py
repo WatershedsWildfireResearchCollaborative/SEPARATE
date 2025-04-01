@@ -3,7 +3,7 @@ import PySimpleGUI as sg
 import numpy as np
 from datetime import datetime
 from functions.build_SEPARATE_layout import build_SEPARATE_layout
-import  functions.SEPARATE_utilities as su
+import functions.SEPARATE_utilities as su
 import functions.SEPARATE_FUNCTIONS as sf
 import pandas as pd
 import os

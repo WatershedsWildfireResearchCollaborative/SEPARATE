@@ -147,7 +147,7 @@ while True:
         # dtype_args['user_interval'] = 'float'  # set userdefined interval to float
 
         # ....................Adjust naming conventions and inputs...................
-        # Adjust some parameter names to make them shorter
+        # Adjusting some parameter names to make them shorter
         if storm_gap_type_name == 'User-Defined MIT (UDM)':
             storm_gap_type = 'UDM'
         elif storm_gap_type_name == 'Travel Time Criterion (TTC)':
@@ -161,6 +161,7 @@ while True:
                 result in slower processing times. Conversely, while using values less than the default value of 
                 48 hours may increase processing times, this can also lead to poorer fits and lower confidence in the selection of the MIT
                 """
+                # display warning if isc time is greater than 48 hours
                 sg.popup_no_wait(isc_warning, title="Warning",text_color='black', background_color='white',
                          button_color=('black', 'lightblue'))
 
@@ -295,9 +296,9 @@ while True:
                                                                                                      interevent_times,
                                                                                                      min_depth,
                                                                                                      min_duration)
-                total_storms = N_nofilter
-                suppressed_storms = N_suppressed
-                N_storms = total_storms - suppressed_storms
+                total_storms = N_nofilter # total number of storms
+                suppressed_storms = N_suppressed # number of suppressed storms
+                N_storms = total_storms - suppressed_storms # number of storms after filtering
                 window['PBAR'].update(40)
 
                 # setup rainfall intensity intervals to calculate
@@ -413,7 +414,6 @@ while True:
                     'Tip Magnitude:': f'{tip_mag}',
                     'Tip Units:': f'{tip_units}',
                     'Logging Interval (min):': f'{logging_interval}',
-                    # should make this only included it fixed logging interval
                     'Fixed MIT Selection Criterion:': f'{storm_gap_type_name}',
                     'Minimum Inter-Event Time (hours):': f'{np.round(Fixed_MIT, 2)}',
                     'Total Number of Storms in Record:': f'{total_storms}',
@@ -517,9 +517,6 @@ while True:
                     print("Cleaned up simulation variables, GUI remains intact.")
                 sg.popup('Complete!', title='Complete', text_color='black', background_color='white',
                          button_color=('black', 'lightblue'))
-
-                # optionally clean
-
             except:
                 window['PBAR'].update(0)
                 if errmsg:  # caused a defined error occurred
