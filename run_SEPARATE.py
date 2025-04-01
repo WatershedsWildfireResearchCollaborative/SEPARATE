@@ -1,3 +1,10 @@
+'''
+Code meta data
+Author: Scott David; Brendan Murphy
+Date Last Updated: 04/01/2025
+License: MIT
+
+'''
 # %% import required packages
 import PySimpleGUI as sg
 import numpy as np
@@ -7,7 +14,7 @@ import  functions.SEPARATE_utilities as su
 import functions.SEPARATE_FUNCTIONS as sf
 import pandas as pd
 import os
-from scipy import stats
+# from scipy import stats
 
 
 # https://stackoverflow.com/questions/7674790/bundling-data-files-with-pyinstaller-onefile
@@ -16,12 +23,16 @@ from scipy import stats
 # %% setup gui parameters -- most of this occurs in the build_separate_layout function
 # Set up the color schemes, font sizes, and other toggles for the gui
 resize = True  # allow the user to resize the window
-clean_variables = False
+#clean_variables = False
 # import the layout from build_SEPARTAE_layout.py
 layout, background_color, help_messages = build_SEPARATE_layout()
 
 # Create the window
 window = sg.Window('SEPARATE v1.0', layout, resizable=resize, background_color=background_color, finalize=True)
+
+# adding in a min size for the window this is an attempt to fix the issue with the window being too small
+window.TKroot.minsize(100, 100)  # Adjust these dimensions as needed
+
 
 # software_metadata = ['SEPARATE - Summary Storm Event Output Table', 'Version 1.0 (03/01/2025)',
 #                      'License/Copyright Details', 'Requested reference: Murphy & David (2024), Journal, etc.',
@@ -229,6 +240,12 @@ while True:
                                                                                                             sheetname,
                                                                                                             tip_type,
                                                                                                             tip_mag)
+                # check that the input data is consistent with the user input tip type
+                tip_is_valid, inferred = su.validate_tip_type(tip_datetime, tip_type)
+                if not tip_is_valid:
+                    tip_err_msg= f"Tip type mismatch.\nYou selected '{tip_type}', but SEPARATE inferred '{inferred}' based on timestamp spacing."
+                    sg.popup_error(tip_err_msg, title='Tip Type Warning', text_color='black',
+                               background_color='white', button_color=('black', 'lightblue'))
 
                 # update progress bar
                 window['PBAR'].update(10)
@@ -406,8 +423,17 @@ while True:
                 if tip_type == 'Cumulative Tips': # if cumulative tips then no logging interval
                     logging_interval='N/A'
 
+                # if min duration is not provided write N/A to header
+                if not min_duration_TF:
+                    min_duration = 'N/A'
+
+                # if min depth is not provided write N/A to header
+                if not min_depth_TF:
+                    min_depth = 'N/A'
+
+                # build header for output files
                 header_parameters = {
-                    # 'Dataset ID:': f'{output_name}',
+                    'Dataset ID:': f'{output_name}',
                     'Record Start Date:': f'{start_date}',
                     'Record End Date:': f'{end_date}',
                     'Tipping Bucket Record Type:': f'{tip_type}',
@@ -446,7 +472,7 @@ while True:
                 # first output the ISC results
                 # if optimized output the fitting parameters to a file
                 if storm_gap_type == 'ISC':
-                    # will likely need some rebuilding for new output structures
+                    # output the fitting parameters
                     sf.output_fitting_parameters_to_file(software_metadata, header_parameters, CV_IET, mean_IET,
                                                          std_IET,ISC_testintervals, StormNumsRec,
                                                           output_name, gap_plots_path)
@@ -462,7 +488,6 @@ while True:
                     'duration': 'Duration',
                     'magnitude': 'Magnitude',
                     'intensity_avg': 'Storm_Intensity',
-                    # ... etc. ...
                 }, inplace=True)
 
 
@@ -498,25 +523,28 @@ while True:
                 # update progress bar
                 print('complete')
 
+
                 # update progress bar
                 window['PBAR'].update(100)
 
-                # optionally clean out variables
-                if clean_variables:
-                    # List of variables to keep (do not clear)
-                    keep_vars = ["sg", "np", "datetime", "pd", "os", "stats",
-                                 "su", "sf", "build_SEPARATE_layout", "clean_variables",
-                                 "window", "event", "args", "layout", "background_color",
-                                 "help_messages", "resize", "software_metadata"]
+                # # optionally clean out variables
+                # if clean_variables:
+                #     # List of variables to keep (do not clear)
+                #     keep_vars = ["sg", "np", "datetime", "pd", "os", "stats",
+                #                  "su", "sf", "build_SEPARATE_layout", "clean_variables",
+                #                  "window", "event", "args", "layout", "background_color",
+                #                  "help_messages", "resize", "software_metadata"]
+                #
+                #     # Delete all non-essential variables
+                #     for var in list(globals().keys()):
+                #         if var not in keep_vars:
+                #             del globals()[var]
 
-                    # Delete all non-essential variables
-                    for var in list(globals().keys()):
-                        if var not in keep_vars:
-                            del globals()[var]
-
-                    print("Cleaned up simulation variables, GUI remains intact.")
+                    # print("Cleaned up simulation variables, GUI remains intact.")
                 sg.popup('Complete!', title='Complete', text_color='black', background_color='white',
                          button_color=('black', 'lightblue'))
+                # try to avoid resizing error on completion that I could never replicate
+                window.refresh()  # refresh the window
             except:
                 window['PBAR'].update(0)
                 if errmsg:  # caused a defined error occurred

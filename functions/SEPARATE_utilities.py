@@ -234,8 +234,37 @@ def check_input_type(input_args, required_fields, dtype_args):
 
     return tf_type, error_message
 
-# def validate_tip_type (tip_datetime, tip_type):
-#     logging_interval = tip_datetime.diff().dt.total_seconds() / 60
+def validate_tip_type(tip_datetime, tip_type):
+    """
+    Validates the provided tip_type ('fixed interval' or 'cumulative tips') based on
+    observed time intervals between tips.
+
+    Args:
+        tip_datetime (pd.Series or list): Series of datetime values from the tip file.
+        tip_type (str): User-specified tip type ("fixed interval" or "cumulative tips").
+
+    Returns:
+        valid_tip_type (bool): True if tip_type matches the inferred type, False otherwise.
+        inferred_type (str): What the function infers the tip type to be.
+    """
+
+    # Take a small sample for performance and reduce outlier risk
+    subsample = tip_datetime.iloc[:10].copy()
+
+    # Calculate time deltas in minutes
+    dt = subsample.diff().dt.total_seconds().dropna() / 60
+
+    # Use a small std threshold to allow for float rounding
+    if dt.std() < 0.01:
+        inferred_type = "Fixed Interval"
+    else:
+        inferred_type = "Cumulative Tips"
+
+    # check if expected matches input tip type
+    valid_tip_type = (tip_type == inferred_type)
+    return valid_tip_type, inferred_type
+
+
 
 
 #
