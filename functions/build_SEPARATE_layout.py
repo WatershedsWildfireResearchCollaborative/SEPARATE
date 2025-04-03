@@ -19,10 +19,10 @@ def resource_path(relative_path):  # fixes paths for pyintaller
 
 def build_SEPARATE_layout():
     # Fonts and Colors
-    header_font = ("Arial", 16, "bold")
-    section_header_font = ("Arial", 14, "bold")
-    label_font = ("Arial", 12,"bold")
-    input_font = ("Arial", 12)
+    # header_font = ("Arial", 16, "bold")
+    section_header_font = ("Arial", 16, "bold")
+    label_font = ("Arial", 14,"bold")
+    input_font = ("Arial", 14)
     input_text_color = "black"
     header_color = "black"
     background_color = "white"
@@ -33,7 +33,7 @@ def build_SEPARATE_layout():
     button_color = (input_text_color, button_bg)
     help_color = 'white'
     help_width = 0
-    button_font = ('Arial', 12, 'bold')
+    button_font = ('Arial', 14, 'bold')
 
 
     help_messages = build_help_dialogue()
@@ -131,7 +131,7 @@ def build_SEPARATE_layout():
                     background_color=background_color,
                     text_color=text_color,
                     justification='center',
-                    font=("Arial", 12, "bold")),
+                    font=label_font ),
             sg.Button(image_filename=info_button,
                       button_color=('white', 'white'),
                       border_width=0,
@@ -156,7 +156,7 @@ def build_SEPARATE_layout():
         #1
         [
         sg.Button(image_filename=info_button, button_color=('white', 'white'), border_width=0, key='info5',pad=pad1),
-            sg.Text("For User-Defined MIT",background_color=background_color, font=("Arial", 12, "bold"),
+            sg.Text("For User-Defined MIT",background_color=background_color, font=label_font ,
                 text_color=text_color)
 
           ],
@@ -167,7 +167,7 @@ def build_SEPARATE_layout():
         #3
         [
         sg.Button(image_filename=info_button, button_color=('white', 'white'), border_width=0, key='info6', pad=pad1),
-        sg.Text("For Statistically Independent Storms", background_color=background_color, font=("Arial", 12, "bold"),
+        sg.Text("For Statistically Independent Storms", background_color=background_color, font=label_font ,
                     text_color=text_color),
          ],
         #4
@@ -241,7 +241,7 @@ def build_SEPARATE_layout():
         [
             sg.Button(image_filename=info_button, button_color=('white', 'white'), border_width=0, key='info8'),
 
-            sg.Text("Additional Exclusion Criteria", background_color=background_color, font=("Arial", 12, "bold"),
+            sg.Text("Additional Exclusion Criteria", background_color=background_color, font=label_font,
                  text_color=text_color),
          ],
         ]

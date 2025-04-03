@@ -1,10 +1,32 @@
-'''
-Code meta data
-Author: Scott David; Brendan Murphy
-Date Last Updated: 04/01/2025
-License: MIT
 
-'''
+"""
+SEPARATE: SEPARATE: Storm Event Partitioning And Rainfall Analytics for Tipping-bucket rain gauge data Evaluation
+
+Authors:
+    Scott David (Utah State University)
+    Brendan Murphy (Simon Fraser University)
+
+Version: 1.0
+Last Updated: 2025-04-02
+License: MIT License
+
+Description:
+    This tool allows users to partition tipping bucket rain gauge (TBRG) data into discrete storm events
+    using customizable inter-event time (IET) methods. Users can calculate storm metrics including duration,
+    total depth, intensity, and peak rainfall rates at specified intervals. Includes a GUI for ease of use.
+
+Repository:
+    https://github.com/WatershedsWildfireResearchCollaborative/SEPARATE
+
+Citation:
+    Murphy & David (2024), [Journal/DOI if known or placeholder]
+
+Dependencies:
+    Python ≥ 3.10
+    PySimpleGUI == 4.60.5
+    pandas, numpy, matplotlib, scipy, openpyxl
+"""
+
 # %% import required packages
 import PySimpleGUI as sg
 import numpy as np
@@ -15,7 +37,8 @@ import functions.SEPARATE_FUNCTIONS as sf
 import pandas as pd
 import os
 # from scipy import stats
-
+import platform
+import ctypes
 
 # https://stackoverflow.com/questions/7674790/bundling-data-files-with-pyinstaller-onefile
 # todo turn main on for distro
@@ -27,11 +50,25 @@ resize = True  # allow the user to resize the window
 # import the layout from build_SEPARTAE_layout.py
 layout, background_color, help_messages = build_SEPARATE_layout()
 
+# force dpi scaling for windows
+# this should fix the window resizing issues after running the event on windows
+if platform.system() == 'Windows':
+    try:
+        ctypes.windll.shcore.SetProcessDpiAwareness(1)
+    except:
+        pass
+
+# set initial window size
+screen_width, screen_height = sg.Window.get_screen_size()
+disp_width = min(screen_width, 800) # limit to 800
+disp_height = int(screen_height * 1)  # 85% of the screen height
 # Create the window
-window = sg.Window('SEPARATE v1.0', layout, resizable=resize, background_color=background_color, finalize=True)
+window = sg.Window('SEPARATE v1.0', layout, resizable=resize, background_color=background_color,
+                   size=(disp_width, disp_height), finalize=True)
 
 # adding in a min size for the window this is an attempt to fix the issue with the window being too small
 window.TKroot.minsize(100, 100)  # Adjust these dimensions as needed
+
 
 
 # software_metadata = ['SEPARATE - Summary Storm Event Output Table', 'Version 1.0 (03/01/2025)',
@@ -243,9 +280,9 @@ while True:
                 # check that the input data is consistent with the user input tip type
                 tip_is_valid, inferred = su.validate_tip_type(tip_datetime, tip_type)
                 if not tip_is_valid:
-                    tip_err_msg= f"Tip type mismatch.\nYou selected '{tip_type}', but SEPARATE inferred '{inferred}' based on timestamp spacing."
-                    sg.popup_error(tip_err_msg, title='Tip Type Warning', text_color='black',
-                               background_color='white', button_color=('black', 'lightblue'))
+                    tip_err_msg= f"Warning: Tip type mismatch.\nYou selected '{tip_type}', but SEPARATE inferred '{inferred}' based on timestamp spacing."
+                    sg.popup(tip_err_msg, title='Tip Type Warning', text_color='black',
+                               background_color='white', button_color=('black', 'lightblue'),  custom_text='Continue')
 
                 # update progress bar
                 window['PBAR'].update(10)

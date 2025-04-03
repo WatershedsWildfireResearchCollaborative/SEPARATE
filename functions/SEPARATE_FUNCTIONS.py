@@ -850,8 +850,8 @@ def separate_outputs(output, storm_profiles, storm_raw_profiles, tip_units, I_in
 
     # Adjust spacing between subplots
     # plt.subplots_adjust(hspace=0.1)
-    s_date = user_parameters_df['Parameter'][0]
-    e_date = user_parameters_df['Parameter'][1]
+    s_date = user_parameters_df['Parameter'][1]
+    e_date = user_parameters_df['Parameter'][2]
     fig_title = (f'{output_name}\nDate Range: {s_date} - {e_date}')
 
     plt.suptitle(fig_title, fontsize=14)
