@@ -264,37 +264,10 @@ def separate_ISC(tip_datetime, tip_depth, isc_t_max, min_depth, min_duration,
         ax2.set_xlabel("Tested Inter-Event Interval [hrs]")
         ax2.legend(loc='upper right')
         ax2.grid(True)
-        plot_fid = os.path.join(gap_plots_path, output_name + '_FractionSuppressed' + plt_ext)
+        plot_fid = os.path.join(gap_plots_path, output_name + '_SuppressedStorms' + plt_ext)
         plt.savefig(plot_fid)  # save
         plt.close()
 
-        # # plot histogram of inter-event times with exponential fit
-        # fig3, ax3 = plt.subplots(figsize=(8, 6))
-        # all_IET = ISC_interevent_times  # get the last set of IETs
-        # bin_width = 1
-        # bins = np.arange(0, np.nanmax(all_IET) + bin_width, bin_width)
-        #
-        # # Histogram
-        # n, bins, patches = ax3.hist(all_IET, bins=bins, density=True, alpha=0.6, color='gray', label="Observed")
-        #
-        # # Exponential Fit
-        # if np.nanmean(all_IET) > 0:
-        #     lam = 1 / mean_tb
-        #     x_vals = FILTERED EVENT TIMES
-        #     y_vals = lam * np.exp(-lam * x_vals)
-        #     ax3.plot(x_vals, y_vals, 'r-', lw=2, label='Exponential Fit')
-        #
-        # ax3.set_xlabel("Inter-Event Time (hrs)")
-        # ax3.set_ylabel("Probability Density")
-        # ax3.set_title("Histogram of Inter-Event Times with Exponential Fit")
-        # ax3.legend()
-        # ax3.grid(True)
-        #
-        # plot_fid = os.path.join(gap_plots_path, output_name + '_InterEventTimes' + plt_ext)
-        # plt.savefig(plot_fid)
-        # plt.close()
-        #
-        #
         return tb0, mean_tb, CV_IET, mean_IET,std_IET, ISC_testintervals, StormNumsRec
 
 
@@ -492,7 +465,7 @@ def separate_filter(storm_data, interevent_times, min_mag, min_dur):
 
 def separate_profiler(StormIDX, storm_data, tip_datetime, tip_depth, int_min):
     """
-    Python version of the MATLAB SEPARATE_PROFILER function.
+    Extract storm profile data.
 
     Args:
         StormIDX (int): Storm index (0-based) to process.
@@ -564,6 +537,49 @@ def separate_profiler(StormIDX, storm_data, tip_datetime, tip_depth, int_min):
 
     return iD_Mag, iD_time, R_fit, t_fit, tip_idx, cum_rain, duration_min
 
+    # change this to function call plot_inter_event_histogram
+
+
+def plot_inter_event_histogram(filtered_interevent_times, mean_tb, gap_plots_path, output_name, plt_ext, Fixed_MIT):
+    """
+    Plots a histogram of inter-event times with an exponential fit.
+
+    Parameters:
+    - filtered_interevent_times: array-like, inter-event times [hrs]
+    - mean_tb: float, mean of the inter-event times [hrs]
+    - gap_plots_path: str, path to save the figure
+    - output_name: str, prefix for the output filename
+    - plt_ext: str, file extension (e.g., '.png')
+    - Fixed_MIT: float, used for bin width in histogram
+    """
+
+    # Exponential PDF fit
+    lam = 1 / mean_tb
+    max_time = max(filtered_interevent_times)
+    x_vals = np.arange(0, max_time + 1, 0.1)
+    y_vals = lam * np.exp(-lam * x_vals)
+
+    # Create bins using fixed MIT
+    bins = np.arange(0, max_time + Fixed_MIT, Fixed_MIT)
+
+    # Plot
+    fig, ax = plt.subplots(figsize=(8, 6))
+    ax.hist(filtered_interevent_times, bins=bins, density=True, alpha=0.75,
+            label=f'Histogram (bin width = {Fixed_MIT})')
+    ax.plot(x_vals, y_vals, 'r-', lw=2, label='Exponential Fit')
+
+    ax.set_xlabel("Inter-Event Time [hours]")
+    ax.set_ylabel("Probability Density")
+    ax.set_title("Distribution of Inter-Storm Times (Not Including Suppressed Storms)")
+    ax.legend(loc='upper right')
+    ax.grid(False)
+    plt.box(True)
+    plt.tight_layout()
+
+    # Save figure
+    filename = f"{output_name}_ExponentialFit{plt_ext}"
+    plt.savefig(os.path.join(gap_plots_path, filename))
+    plt.close()
 
 def separate_peak_intensity(start_time_abs, t_fit, R_fit, intensity_interval):
     """
