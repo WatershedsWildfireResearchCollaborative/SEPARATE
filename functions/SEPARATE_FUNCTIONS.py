@@ -229,10 +229,10 @@ def separate_ISC(tip_datetime, tip_depth, isc_t_max, min_depth, min_duration,
         axs[0].set_xticks(np.arange(0, np.max(ISC_testintervals), 6))
         if tb0 is not None:
             axs[0].text(tb0 + 1, 1 + axs[0].get_ylim()[1] / 20, f"MIT = {tb0:.1f} hrs")
-        axs[0].set_title("Analysis of Inter-event Independence")
+        # axs[0].set_title("Analysis of Inter-event Independence")
         axs[0].legend(loc='upper right')
         axs[0].set_xlabel("Tested Inter-Event Interval [hrs]")
-        axs[0].set_ylabel("Inverse of Time [hrs$^{-1}$]")
+        axs[0].set_ylabel("Time [hrs$^{-1}$]")
         axs[0].grid(True)
 
         axs[1].plot(ISC_testintervals, CV_IET, 'k-', linewidth=1, label='CV')
@@ -242,7 +242,7 @@ def separate_ISC(tip_datetime, tip_depth, isc_t_max, min_depth, min_duration,
         axs[1].set_ylim([0, axs[1].get_ylim()[1]])
         axs[1].set_xlim([0, np.max(ISC_testintervals)])
         axs[1].set_xticks(np.arange(0, np.max(ISC_testintervals), 6))
-        axs[1].set_title("Independence Criterion")
+        # axs[1].set_title("Independence Criterion")
         axs[1].set_xlabel("Tested Inter-Event Interval [hrs]")
         axs[1].set_ylabel("CV")
         axs[1].grid(True)
@@ -264,11 +264,38 @@ def separate_ISC(tip_datetime, tip_depth, isc_t_max, min_depth, min_duration,
         ax2.set_xlabel("Tested Inter-Event Interval [hrs]")
         ax2.legend(loc='upper right')
         ax2.grid(True)
-        plot_fid = os.path.join(gap_plots_path, output_name + '_InterEventTimes' + plt_ext)
+        plot_fid = os.path.join(gap_plots_path, output_name + '_FractionSuppressed' + plt_ext)
         plt.savefig(plot_fid)  # save
         plt.close()
 
-        return tb0, CV_IET, mean_IET,std_IET, ISC_testintervals, StormNumsRec
+        # # plot histogram of inter-event times with exponential fit
+        # fig3, ax3 = plt.subplots(figsize=(8, 6))
+        # all_IET = ISC_interevent_times  # get the last set of IETs
+        # bin_width = 1
+        # bins = np.arange(0, np.nanmax(all_IET) + bin_width, bin_width)
+        #
+        # # Histogram
+        # n, bins, patches = ax3.hist(all_IET, bins=bins, density=True, alpha=0.6, color='gray', label="Observed")
+        #
+        # # Exponential Fit
+        # if np.nanmean(all_IET) > 0:
+        #     lam = 1 / mean_tb
+        #     x_vals = FILTERED EVENT TIMES
+        #     y_vals = lam * np.exp(-lam * x_vals)
+        #     ax3.plot(x_vals, y_vals, 'r-', lw=2, label='Exponential Fit')
+        #
+        # ax3.set_xlabel("Inter-Event Time (hrs)")
+        # ax3.set_ylabel("Probability Density")
+        # ax3.set_title("Histogram of Inter-Event Times with Exponential Fit")
+        # ax3.legend()
+        # ax3.grid(True)
+        #
+        # plot_fid = os.path.join(gap_plots_path, output_name + '_InterEventTimes' + plt_ext)
+        # plt.savefig(plot_fid)
+        # plt.close()
+        #
+        #
+        return tb0, mean_tb, CV_IET, mean_IET,std_IET, ISC_testintervals, StormNumsRec
 
 
 def separate_storms(tip_datetime, tip_depth, test_interval):

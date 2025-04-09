@@ -315,7 +315,7 @@ while True:
                         os.makedirs(gap_plots_path, exist_ok=True)
 
                     # compute storm gap using optimized method
-                    Fixed_MIT, CV_IET, mean_IET, std_IET, ISC_testintervals, StormNumsRec = sf.separate_ISC(
+                    Fixed_MIT, mean_tb, CV_IET, mean_IET, std_IET, ISC_testintervals, StormNumsRec = sf.separate_ISC(
                         tip_datetime, tip_depth, isc_t_max, min_depth, min_duration,
                         gap_plots_path, output_name, plt_ext)
 
@@ -350,6 +350,28 @@ while True:
                                                                                                      interevent_times,
                                                                                                      min_depth,
                                                                                                      min_duration)
+                # BUILD HIST WITH FILTERED STORMS
+                if storm_gap_type=="ISC":
+                    # change this to function call plot_inter_event_histogram
+                    # def plot_inter_event_histogram(filtered_interevent_times,mean_tb, gap_plots_path, output_name, plt_ext):
+                    # plot inter-event intervals historgram
+                    fig3, ax3 = plt.subplots(figsize=(8, 6))
+                    # # set bin width width to fixed mit value
+                    # ax3.hist(filtered_interevent_times)
+                    # ax3.set_xlabel("Inter-event Intervals (hours)")
+                    # ax3.set_ylabel("Number of Storms")
+                    # ax3.set_title("Inter-event Intervals Histogram")
+                    # # Exponential Fit
+                    # lam = 1 / mean_tb
+                    # x_vals = np.arrange(0, max(filtered_interevent_times), 0.1) # FILTERED EVENT TIMES
+                    # y_vals = lam * np.exp(-lam * x_vals)
+                    # ax3.plot(x_vals, y_vals, 'r-', lw=2, label='Exponential Fit')
+                    # a3.plot(x_vals,y_vals)
+                    # plt.tight_layout()
+                    # plt.savefig(os.path.join(gap_plots_path, output_name + '_inter_event_histogram' + plt_ext))
+                # HIST FILTER STORMS
+                # 1/TB0
+
                 total_storms = N_nofilter # total number of storms
                 suppressed_storms = N_suppressed # number of suppressed storms
                 N_storms = total_storms - suppressed_storms # number of storms after filtering

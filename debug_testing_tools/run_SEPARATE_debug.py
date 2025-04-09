@@ -15,14 +15,14 @@ software_metadata = ['SEPARATE - Summary Storm Event Output Table', 'Version 1.0
 # ....................Load in user inputs to variables...................
 # update the progress bar with 5 progress
 # Set the input file paths
-filename = r'C:\Users\Scott\Desktop\fixed_interval.xlsx'  # input file
+filename = r'C:\Users\Scott\Desktop\McDougall_South_Summer2024_Cleaned.xlsx'  # input file
 # filename = r'C:\Users\Scott\Desktop\syn_cum.xlsx'  # input file
 # optionally define sheet name
 sheetname = ''
 
 # tipping and logging data
-# tip_type = 'Cumulative Tips'  # Set tip record type
-tip_type = 'Fixed Interval'  # Set tip record type
+tip_type = 'Cumulative Tips'  # Set tip record type
+# tip_type = 'Fixed Interval'  # Set tip record type
 
 tip_mag = 0.2  # set the magnitude of each tip
 
@@ -51,7 +51,7 @@ min_duration = 0.5
 # output options
 output_path = r'C:\Users\Scott\Desktop\debug'
 
-output_name = 'ff2'
+output_name = 'hist'
 
 plt_ext = '.png'
 
@@ -303,7 +303,7 @@ for i in range(N_storms):
 # Generate output excel file
 # build header for output files
 header_parameters = {
-    # 'Dataset ID:': f'{output_name}',
+    'Dataset ID:': f'{output_name}',
     'Record Start Date:': f'{start_date}',
     'Record End Date:': f'{end_date}',
     'Tipping Bucket Record Type:': f'{tip_type}',
