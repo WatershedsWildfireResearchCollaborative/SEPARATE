@@ -540,7 +540,7 @@ def separate_profiler(StormIDX, storm_data, tip_datetime, tip_depth, int_min):
     # change this to function call plot_inter_event_histogram
 
 
-def plot_inter_event_histogram(filtered_interevent_times, mean_tb, gap_plots_path, output_name, plt_ext, Fixed_MIT):
+def plot_inter_event_histogram(filtered_interevent_times, mean_tb, Fixed_MIT, gap_plots_path, output_name, plt_ext):
     """
     Plots a histogram of inter-event times with an exponential fit.
 
@@ -565,7 +565,7 @@ def plot_inter_event_histogram(filtered_interevent_times, mean_tb, gap_plots_pat
     # Plot
     fig, ax = plt.subplots(figsize=(8, 6))
     ax.hist(filtered_interevent_times, bins=bins, density=True, alpha=0.75,
-            label=f'Histogram (bin width = {Fixed_MIT})')
+            label=f'Histogram (bin width = {np.round(Fixed_MIT,2)})')
     ax.plot(x_vals, y_vals, 'r-', lw=2, label='Exponential Fit')
 
     ax.set_xlabel("Inter-Event Time [hours]")

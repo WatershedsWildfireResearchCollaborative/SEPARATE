@@ -352,7 +352,7 @@ while True:
                                                                                                      min_duration)
                 # BUILD histogram of filtered inter-event times and exponential function
                 if storm_gap_type=="ISC":
-                    sf.plot_inter_event_histogram(filtered_interevent_times, mean_tb, gap_plots_path,
+                    sf.plot_inter_event_histogram(filtered_interevent_times, mean_tb, Fixed_MIT, gap_plots_path,
                                                 output_name, plt_ext)
 
                 total_storms = N_nofilter # total number of storms
