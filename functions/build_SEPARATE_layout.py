@@ -39,7 +39,7 @@ def build_SEPARATE_layout():
     help_messages = build_help_dialogue()
 
     # set path for info button log
-    info_button = resource_path(r"images\info_button.png")
+    info_button = resource_path(os.path.join("images\info_button.png"))
 
     pad1 =((30, 0), (0, 0))
     pad2 =((60, 0), (0, 0))
@@ -47,7 +47,7 @@ def build_SEPARATE_layout():
 
 
     #%% Header
-    header_path = resource_path(r"images\header.png")
+    header_path = resource_path(os.path.join("images\header.png"))
     gui_header = [
         [sg.Image(header_path, pad=((0, 0), (0, 10)))]
     ]

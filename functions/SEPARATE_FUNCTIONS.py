@@ -13,6 +13,11 @@ import PySimpleGUI as sg
 from matplotlib.ticker import MaxNLocator
 from scipy import stats
 
+# this is required for eps and pdf figure saving
+import matplotlib
+matplotlib.use('Agg')
+import matplotlib.backends.backend_ps
+
 # from scipy.constants import minute
 # from sklearn.linear_model import LinearRegression
 
@@ -1058,77 +1063,3 @@ def separate_outputs(output, storm_profiles, storm_raw_profiles, tip_units, I_in
 
     return errmsg
 
-
-
-
-# def separate_filterold(storm_data, interevent_times, min_mag, min_dur):
-#     N_nofilter = len(storm_data)
-#     flag_idx = []  # indices of storms to suppress
-#
-#     # Build flag indices based on the criteria.
-#     for i, storm in enumerate(storm_data):
-#         duration = storm['duration']
-#         magnitude = storm['magnitude']
-#         # Apply filtering logic
-#         if min_dur is not None and min_mag is not None:
-#             if duration > min_dur and magnitude > min_mag:
-#                 continue
-#             else:
-#                 flag_idx.append(i)
-#
-#         elif min_mag is not None and min_dur is None:
-#             if magnitude > min_mag:
-#                 continue
-#             else:
-#                 flag_idx.append(i)
-#
-#         elif min_dur is not None and min_mag is None:
-#             if duration > min_dur:
-#                 continue
-#             else:
-#                 flag_idx.append(i)
-#
-#     N_suppressed = len(flag_idx)
-#
-#     # If flag_idx has values, proceed with filtering
-#     if flag_idx:
-#         # Remove storms from storm_data
-#         storm_data = [storm for i, storm in enumerate(storm_data) if i not in flag_idx]
-#
-#         # Handling interevent_times updates
-#         if flag_idx[-1] == N_nofilter - 1 and len(flag_idx) > 1:
-#             # Case where last storm is removed and previous values are sequential
-#             initial_idx = len(flag_idx) - 1
-#             indices2remove = [initial_idx]
-#             while initial_idx > 0 and flag_idx[initial_idx] - flag_idx[initial_idx - 1] == 1:
-#                 initial_idx -= 1
-#                 indices2remove.append(initial_idx)
-#
-#             interevent_times = np.delete(interevent_times, indices2remove)
-#             flag_idx = flag_idx[:-len(indices2remove)]
-#
-#         elif flag_idx[-1] == N_nofilter - 1 and len(flag_idx) == 1:
-#             interevent_times = np.delete(interevent_times, -1)  # Remove last row
-#             flag_idx= np.delete(flag_idx, -1)  # Trim last index for storm
-#
-#         if flag_idx:  # Verify still exists after trimming
-#             if flag_idx[0] == 0:
-#                 flag_idx=flag_idx[1:]
-#                 if len(flag_idx) > 0:  # Ensure we have more flagged storms to process
-#                     # Add IET to next storm's interevent time
-#                     interevent_times[flag_idx[0] - 1] += interevent_times[flag_idx[0]]
-#                     interevent_times = np.delete(interevent_times, flag_idx[0])  # Remove the flagged interevent time
-#                     interevent_times = np.delete(interevent_times, 0)  # Remove first IET
-#                     # interevent_times[flag_idx - 1] += interevent_times[flag_idx]  # Add IET preceding removed storms
-#                     interevent_times = np.delete(interevent_times, flag_idx)  # Remove flagged interevent times
-#                 #
-#                 interevent_times = np.delete(interevent_times, 0)  # Remove first IET
-#             else:
-#                 for idx in flag_idx:
-#                     interevent_times[idx - 1] += interevent_times[idx]
-#                 # Now, delete all flagged indices AT ONCE to avoid shifting issues
-#                 interevent_times = np.delete(interevent_times, flag_idx)
-#
-#
-#     return storm_data, interevent_times, N_nofilter, N_suppressed
-#
