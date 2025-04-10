@@ -21,6 +21,7 @@ LicenseFile=D:\GitHub\WWRC\SEPARATE_Compiled\LICENSE.txt
 OutputDir=D:\GitHub\WWRC\SEPARATE_Compiled\
 OutputBaseFilename=SEPARATE_setup
 SetupIconFile=D:\GitHub\WWRC\SEPARATE_Compiled\dist\SEPARATE\images\icon.ico
+UninstallDisplayIcon={app}\SEPARATE.exe**
 Compression=lzma
 SolidCompression=yes
 WizardStyle=modern
