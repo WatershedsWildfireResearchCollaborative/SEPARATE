@@ -1,0 +1,15 @@
+name: separate-env
+channels:
+  - conda-forge
+  - defaults
+
+dependencies:
+  - python=3.12
+  - pip
+  - matplotlib=3.8.2
+  - numpy=1.26.3
+  - pandas=2.1.4
+  - scipy=1.11.4
+  - openpyxl=3.1.2
+  - pysimplegui=4.60.5
+  - pywin32=306
