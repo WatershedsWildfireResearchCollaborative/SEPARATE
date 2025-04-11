@@ -115,7 +115,7 @@ Each file contains two columns:
    - Cumulative tip count (`Cumulative Tips` format), or
    - Rainfall per interval (`Fixed Interval` format)
 
-Both are preformatted to match SEPARATE’s input requirements.
+Both are preformatted to match SEPARATE’s input requirements. You can use these files to test the interface, explore SEPARATE’s options, or verify that your installation is working correctly.
 
 
 <p align="left">
@@ -130,9 +130,6 @@ Both are preformatted to match SEPARATE’s input requirements.
 
 *Figure: Cumulative tips usage example.*
 
----
-
-You can use these files to test the interface, explore SEPARATE’s options, or verify that your installation is working correctly.
 
 ### Recommended Citation
 
