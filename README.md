@@ -27,7 +27,7 @@ SEPARATE can be used in two ways:
 
 ### 🔹 Option 1: Precompiled Installer (Recommended)
 
-A precompiled Windows installer is available [here](https://your-download-link.com) *(link to be added)*. This version includes all required dependencies and does **not** require Python to be installed.
+A precompiled Windows installer is available [here]([https://your-download-link.com](https://usu.box.com/v/SEPARATE-download)) *(link to be added)*. This version includes all required dependencies and does **not** require Python to be installed.
 
 **Steps:**
 1. Download `SEPARATE_setup.exe` from xyz site.
