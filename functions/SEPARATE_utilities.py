@@ -1,3 +1,7 @@
+import pandas as pd
+import numpy as np
+import os
+
 def is_numeric(value):
     """
     Check if a value is numeric (i.e. can be converted to a float).
@@ -179,8 +183,6 @@ def check_for_required_fields(args):
     required_fields = [x for x in all_fields if x not in remove_fields]
     return required_fields
 
-
-
 def check_input_type(input_args, required_fields, dtype_args):
     """
     Check that all required fields are the correct data type.
@@ -234,35 +236,84 @@ def check_input_type(input_args, required_fields, dtype_args):
 
     return tf_type, error_message
 
-def validate_tip_type(tip_datetime, tip_type):
+def validate_tip_type_from_raw_file(filename, sheetname, tip_type):
     """
-    Validates the provided tip_type ('fixed interval' or 'cumulative tips') based on
-    observed time intervals between tips.
+    Loads the raw tip datetime values from file and validates the user-provided tip type
+    ('Fixed Interval' or 'Cumulative Tips') *before* filtering or preprocessing.
 
     Args:
-        tip_datetime (pd.Series or list): Series of datetime values from the tip file.
-        tip_type (str): User-specified tip type ("fixed interval" or "cumulative tips").
+        filename (str): Path to .csv or .xlsx file.
+        sheetname (str): Sheet name if Excel file (ignored for CSV).
+        tip_type (str): User-specified tip type.
 
     Returns:
-        valid_tip_type (bool): True if tip_type matches the inferred type, False otherwise.
-        inferred_type (str): What the function infers the tip type to be.
+        valid_tip_type (bool): Whether user tip type matches inferred type.
+        inferred_type (str): What the function inferred from spacing.
+        tip_datetime (pd.Series): The raw datetime column (unmodified).
     """
-
-    # Take a small sample for performance and reduce outlier risk
-    subsample = tip_datetime.iloc[:10].copy()
-
-    # Calculate time deltas in minutes
-    dt = subsample.diff().dt.total_seconds().dropna() / 60
-
-    # Use a small std threshold to allow for float rounding
-    if dt.std() < 0.01:
-        inferred_type = "Fixed Interval"
+    # Load file based on extension
+    _, ext = os.path.splitext(filename)
+    ext = ext.lower()
+    if ext == '.xlsx':
+        df = pd.read_excel(filename, sheet_name=sheetname if sheetname else 0)
+    elif ext == '.csv':
+        df = pd.read_csv(filename)
     else:
-        inferred_type = "Cumulative Tips"
+        raise ValueError(f"Unsupported file type: {ext}")
 
-    # check if expected matches input tip type
+    # Extract datetime and coerce any parsing errors
+    datetime_series = pd.to_datetime(df.iloc[:, 0], errors='coerce')
+    if datetime_series.isna().any():
+        print("Warning: Some datetime values could not be parsed.")
+
+    # Sample and compute time differences
+    subsample = datetime_series.dropna().iloc[:10]
+    dt = subsample.diff().dropna()
+
+    if dt.empty or len(dt) < 3:
+        inferred_type = "Cumulative Tips"
+        return False, inferred_type, datetime_series
+
+    dt_sec = dt.dt.total_seconds().values
+    median_dt = np.median(dt_sec)
+    is_fixed_interval = np.allclose(dt_sec, median_dt, rtol=1e-5, atol=0.01)
+
+    inferred_type = "Fixed Interval" if is_fixed_interval else "Cumulative Tips"
     valid_tip_type = (tip_type == inferred_type)
-    return valid_tip_type, inferred_type
+
+    return valid_tip_type, inferred_type, datetime_series
+
+
+# def validate_tip_type(tip_datetime, tip_type):
+#     """
+#     Validates the provided tip_type ('fixed interval' or 'cumulative tips') based on
+#     observed time intervals between tips.
+#
+#     Args:
+#         tip_datetime (pd.Series or list): Series of datetime values from the tip file.
+#         tip_type (str): User-specified tip type ("fixed interval" or "cumulative tips").
+#
+#     Returns:
+#         valid_tip_type (bool): True if tip_type matches the inferred type, False otherwise.
+#         inferred_type (str): What the function infers the tip type to be.
+#     """
+#
+#     # Take a small sample for performance and reduce outlier risk
+#     subsample = tip_datetime.iloc[:10].copy()
+#
+#     # Calculate time deltas in minutes
+#     dt = subsample.diff().dt.total_seconds().dropna() / 60
+#
+#     # Use a small std threshold to allow for float rounding
+#     if dt.std() < 0.01:
+#         inferred_type = "Fixed Interval"
+#     else:
+#         inferred_type = "Cumulative Tips"
+#
+#     # check if expected matches input tip type
+#     valid_tip_type = (tip_type == inferred_type)
+#     return valid_tip_type, inferred_type
+
 
 
 

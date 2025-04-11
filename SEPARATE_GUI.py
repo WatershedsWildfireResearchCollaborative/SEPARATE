@@ -65,7 +65,7 @@ def main():
     disp_height = int(screen_height * 1)  # 85% of the screen height
     # Create the window
     window = sg.Window('SEPARATE v1.0', layout, resizable=resize, background_color=background_color,
-                       size=(disp_width, disp_height), finalize=True)
+                    size=(disp_width, disp_height), finalize=True)
 
     # adding in a min size for the window this is an attempt to fix the issue with the window being too small
     window.TKroot.minsize(100, 100)  # Adjust these dimensions as needed
@@ -76,7 +76,7 @@ def main():
     #                      'License/Copyright Details', 'Requested reference: Murphy & David (2024), Journal, etc.',
     #                      'Published DOI', 'https://github.com/WatershedsWildfireResearchCollaborative/SEPARATE']
     software_metadata = ['SEPARATE - Summary Storm Event Output Table', 'Version 1.0 (03/01/2025)',
-                         'Licensed under the MIT License.']
+                        'Licensed under the MIT License.']
     # %% Running the GUI loop
     while True:
         event, args = window.read()
@@ -212,7 +212,7 @@ def main():
                     """
                     # display warning if isc time is greater than 48 hours
                     sg.popup_no_wait(isc_warning, title="Warning",text_color='black', background_color='white',
-                             button_color=('black', 'lightblue'))
+                            button_color=('black', 'lightblue'))
 
             else:
                 storm_gap_type = 'ISC'
@@ -235,7 +235,7 @@ def main():
                 except:
                     error_msg_dates = "Input date formats can not be interpreted please input date as YYYY-MM-DD "
                     sg.popup_error(error_msg_dates, title='Invalid Dates', text_color='black',
-                                   background_color='white', button_color=('black', 'lightblue'))
+                                background_color='white', button_color=('black', 'lightblue'))
                     tf_date = False
 
             if plot_end_date:
@@ -244,7 +244,7 @@ def main():
                 except:
                     error_msg_dates = "Input date formats can not be interpreted please input date as YYYY-MM-DD "
                     sg.popup_error(error_msg_dates, title='Invalid Dates', text_color='black',
-                                   background_color='white', button_color=('black', 'lightblue'))
+                                background_color='white', button_color=('black', 'lightblue'))
                     tf_date = False
             # # .................... User Input Error checking....................
             # check if the gui has been given all required parameters
@@ -254,7 +254,7 @@ def main():
             if not tf_fields:  # if missing fields throw error window
                 error_msg_fields = "There are required fields not filled out."
                 sg.popup_error(error_msg_fields, title='Missing Values', text_color='black',
-                               background_color='white', button_color=('black', 'lightblue'))
+                            background_color='white', button_color=('black', 'lightblue'))
                 print(missing_fields)
                 tf_fields = False
 
@@ -264,7 +264,7 @@ def main():
                 tf_type, error_msg = su.check_input_type(input_args, required_fields, dtype_args)
                 if not tf_type:  # if not strings throw error window
                     sg.popup_error(error_msg, title='Input Type Error', text_color='black',
-                                   background_color='white', button_color=('black', 'lightblue'))
+                                background_color='white', button_color=('black', 'lightblue'))
 
 
 
@@ -279,11 +279,14 @@ def main():
                                                                                                                 tip_type,
                                                                                                                 tip_mag)
                     # check that the input data is consistent with the user input tip type
-                    tip_is_valid, inferred = su.validate_tip_type(tip_datetime, tip_type)
-                    if not tip_is_valid:
-                        tip_err_msg= f"Warning: Tip type mismatch.\nYou selected '{tip_type}', but SEPARATE inferred '{inferred}' based on timestamp spacing."
-                        sg.popup(tip_err_msg, title='Tip Type Warning', text_color='black',
-                                   background_color='white', button_color=('black', 'lightblue'),  custom_text='Continue')
+                    # tip_is_valid, inferred = su.validate_tip_type(tip_datetime, tip_type)
+                    valid_tip, inferred_tip, raw_datetime = su.validate_tip_type_from_raw_file(filename, sheetname,
+                                                                                            tip_type)
+
+                    if not valid_tip:
+                        sg.popup(
+                            f"Tip type mismatch.\nYou selected '{tip_type}', but SEPARATE inferred '{inferred_tip}'.",
+                            title="Tip Type Warning", text_color='black', background_color='white')
 
                     # update progress bar
                     window['PBAR'].update(10)
@@ -299,7 +302,7 @@ def main():
                                 "not currently allowed in SEPARATE. Reduce the time of your upper limit."
                             )
                             sg.popup_error(ic_error, title='Error', text_color='black', background_color='white',
-                                           button_color=('black', 'lightblue'))
+                                        button_color=('black', 'lightblue'))
 
                         if isc_t_max <= 1:
                             low_ic_error = (
@@ -307,7 +310,7 @@ def main():
                                 "not currently allowed in SEPARATE. Increase the time of your upper limit."
                             )
                             sg.popup_error(low_ic_error, title='Error', text_color='black', background_color='white',
-                                           button_color=('black', 'lightblue'))
+                                        button_color=('black', 'lightblue'))
 
                         # create folder for output plot
                         gap_plots_folder = output_name + '_ISC_analysis'
@@ -338,7 +341,7 @@ def main():
                         Fixed_MIT = 0
                         errmsg = 'Storm gap type not valid'
                         sg.popup_error(errmsg, title='Error', text_color='black', background_color='white',
-                                       button_color=('black', 'lightblue'))
+                                    button_color=('black', 'lightblue'))
                         raise ValueError(errmsg)
 
                     # separate storms
@@ -348,9 +351,9 @@ def main():
 
                     # filter for additional criteria
                     storm_data, filtered_interevent_times, N_nofilter, N_suppressed = sf.separate_filter(storms,
-                                                                                                         interevent_times,
-                                                                                                         min_depth,
-                                                                                                         min_duration)
+                                                                                                        interevent_times,
+                                                                                                        min_depth,
+                                                                                                        min_duration)
                     # BUILD histogram of filtered inter-event times and exponential function
                     if storm_gap_type=="ISC":
                         sf.plot_inter_event_histogram(filtered_interevent_times, mean_tb, Fixed_MIT, gap_plots_path,
@@ -368,9 +371,9 @@ def main():
                     I_intervals = I_intervals / 60.0  # Convert Intensity Intervals to Hours
                     if len(I_intervals_chk) < 1:
                         errmsg = ("Logging interval is greater than storm intensity intervals.\nPlease specify a user "
-                                  "defined interval that is longer than the logging intervals.")
+                                "defined interval that is longer than the logging intervals.")
                         sg.popup_error(errmsg, title='Error', text_color='black', background_color='white',
-                                       button_color=('black', 'lightblue'))
+                                    button_color=('black', 'lightblue'))
                     if plot_opt:
                         plots_folder = output_name + '_storm_plots'
                         plots_path = os.path.join(output_path, plots_folder)
@@ -398,10 +401,10 @@ def main():
                         # print(storm_id_name)
                         # extract the storm profile
                         iD_Mag, iD_time, R_fit, t_fit, tip_idx, cum_rain, duration_min = sf.separate_profiler(StormIDX,
-                                                                                                              storm_data,
-                                                                                                              tip_datetime,
-                                                                                                              tip_depth,
-                                                                                                              plot_int)
+                                                                                                            storm_data,
+                                                                                                            tip_datetime,
+                                                                                                            tip_depth,
+                                                                                                            plot_int)
 
                         start_time_abs = storm_data[StormIDX]['start']
                         peakiD_all = []
@@ -421,12 +424,12 @@ def main():
                                 # store the profile storm profile data
                                 dataset_name = storm_id_name
                                 storm_meta_data = {f'Storm ID:': f'{storm_id_name}',
-                                                   f'Start Date & Time:': f'{start_time_abs}',
-                                                   f'Storm Duration (hrs):': f'{np.round(duration_min / 60, 2)}',
-                                                   f'Storm Magnitude ({tip_units}):': f'{np.round(len(tip_idx) * tip_mag, 2)}',
-                                                   f'Peak {int(interval)}-min Intensity ({tip_units}/hr):': f'{round(peakiDs[1], 2)}',
-                                                   f'Peak Intensity Date and Time:': f'{peak_dt_str}',
-                                                   f'Number of Tips': f'{len(tip_idx)}'}
+                                                f'Start Date & Time:': f'{start_time_abs}',
+                                                f'Storm Duration (hrs):': f'{np.round(duration_min / 60, 2)}',
+                                                f'Storm Magnitude ({tip_units}):': f'{np.round(len(tip_idx) * tip_mag, 2)}',
+                                                f'Peak {int(interval)}-min Intensity ({tip_units}/hr):': f'{round(peakiDs[1], 2)}',
+                                                f'Peak Intensity Date and Time:': f'{peak_dt_str}',
+                                                f'Number of Tips': f'{len(tip_idx)}'}
 
                                 storm_profiles[dataset_name] = {f'Cumulative Storm Time (hours)': np.round(iD_time/60,2),
                                                                 # interpolated time range since start of storm
@@ -442,15 +445,15 @@ def main():
                             if plot_opt and plot_int == interval and ~np.isnan(peakiDs[1]):
                                 peak_dt_str = peakiDs[2].strftime('%Y-%m-%d %H:%M:%S')
                                 fig_title = (f'{output_name}\n'
-                                             f'Storm ID:{storm_id_name}\n'  # int(storms_in[i])
-                                             f'Start Date & Time: {start_time_abs}\n'
-                                             f'Storm Magnitude ({tip_units}): {np.round(len(tip_idx) * tip_mag, 2)}\n'
-                                             f'Peak {int(interval)}-min Intensity ({tip_units}/hr): {round(peakiDs[1], 2)}\n'
-                                             f'Peak Intensity Date and Time:{peak_dt_str}\n'
-                                             )
+                                            f'Storm ID:{storm_id_name}\n'  # int(storms_in[i])
+                                            f'Start Date & Time: {start_time_abs}\n'
+                                            f'Storm Magnitude ({tip_units}): {np.round(len(tip_idx) * tip_mag, 2)}\n'
+                                            f'Peak {int(interval)}-min Intensity ({tip_units}/hr): {round(peakiDs[1], 2)}\n'
+                                            f'Peak Intensity Date and Time:{peak_dt_str}\n'
+                                            )
                                 sf.separate_profile_plots(interval, tip_units, peakiDs[1], peakiDs[3], t_fit, R_fit,
-                                                          tip_idx, iD_time, iD_Mag, fig_title, plots_path, storm_id_name,
-                                                          plt_ext)
+                                                        tip_idx, iD_time, iD_Mag, fig_title, plots_path, storm_id_name,
+                                                        plt_ext)
 
                         # Combine storm data and peak intensity results.
                         combined_record = storm_data[StormIDX].copy()
@@ -517,8 +520,8 @@ def main():
                     if storm_gap_type == 'ISC':
                         # output the fitting parameters
                         sf.output_fitting_parameters_to_file(software_metadata, header_parameters, CV_IET, mean_IET,
-                                                             std_IET,ISC_testintervals, StormNumsRec,
-                                                              output_name, gap_plots_path)
+                                                            std_IET,ISC_testintervals, StormNumsRec,
+                                                            output_name, gap_plots_path)
 
                     # build output dataframe
                     output = pd.DataFrame(storm_record)
@@ -537,8 +540,8 @@ def main():
                     # Define columns for the summary table.
                     # Basic storm data plus peak intensities for each intensity interval.
                     columns = ['StormID', 'Start', 'End', 'Duration', 'Magnitude', 'Storm_Intensity'] + \
-                              [f'Peak_i{int(60 * I_int)}' for I_int in I_intervals] + \
-                              [f'Peak_i{int(60 * I_int)}_time' for I_int in I_intervals]
+                            [f'Peak_i{int(60 * I_int)}' for I_int in I_intervals] + \
+                            [f'Peak_i{int(60 * I_int)}_time' for I_int in I_intervals]
 
                     # Define units for each column (for header purposes).
                     units = ['Unique Identifier', 'date_time', 'date_time', 'hours', tip_units, tip_units + '/hr'] + \
@@ -552,16 +555,16 @@ def main():
                         f'Peak_i{int(60 * I_intervals[0])}'].isnull().all():  # np.all(np.isnan(output[f'Peak_i{int(60 * I_intervals[0])}'])):
                         errmsg = 'Rainfall Intensity Interval Greater Than All Storm Durations\n'
                         sg.popup_error(errmsg, title='Error', text_color='black', background_color='white',
-                                       button_color=('black', 'lightblue'))
+                                    button_color=('black', 'lightblue'))
                         # raise ValueError(errmsg)
                     else:
                         errmsg = None
 
                     # create final outputs
                     errmsg = sf.separate_outputs(output, storm_profiles, storm_raw_profiles, tip_units,
-                                                 I_intervals, data_opt, header_parameters, output_path,
-                                                 output_name, plot_int, plt_ext, plot_start_date, plot_end_date,
-                                                 software_metadata, columns, units)
+                                                I_intervals, data_opt, header_parameters, output_path,
+                                                output_name, plot_int, plt_ext, plot_start_date, plot_end_date,
+                                                software_metadata, columns, units)
 
                     # update progress bar
                     print('complete')
@@ -584,14 +587,14 @@ def main():
                     #             del globals()[var]
                         # print("Cleaned up simulation variables, GUI remains intact.")
                     sg.popup('Complete!', title='Complete', text_color='black', background_color='white',
-                             button_color=('black', 'lightblue'))
+                            button_color=('black', 'lightblue'))
                     # try to avoid resizing error on completion that I could never replicate
                     window.refresh()  # refresh the window
                 except Exception as e:
                     window['PBAR'].update(0)
                     if errmsg:  # caused a defined error occurred
                         sg.popup_error(errmsg, title='Error', text_color='black', background_color='white',
-                                       button_color=('black', 'lightblue'))
+                                    button_color=('black', 'lightblue'))
                     else:  # an undefined error occurred
                         sg.popup(
                             f'Something unexpected happened!\n\nError:\n{str(e)}\n\nPlease contact the developers for help.',
