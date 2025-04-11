@@ -106,8 +106,8 @@ To help users get started quickly, we include two example datasets in the [`Exam
 
 | Filename                             | Description                                                                 |
 |--------------------------------------|-----------------------------------------------------------------------------|
-| `FixedInterval_TBRG_Example.xlsx`    | Synthetic dataset logged at regular intervals using fixed time steps.      |
-| `CumulativeTips_TBRG_Example.xlsx`   | Synthetic dataset with cumulative tip logging style (e.g., HOBO loggers).  |
+| `FixedInterval_TBRG_Example.xlsx`    | Example dataset logged at regular intervals using fixed time steps.      |
+| `CumulativeTips_TBRG_Example.xlsx`   | Example dataset with cumulative tip logging style (e.g., HOBO loggers).  |
 
 Each file contains two columns:
 1. **Timestamp** in the format `MM/DD/YY HH:MM:SS`
