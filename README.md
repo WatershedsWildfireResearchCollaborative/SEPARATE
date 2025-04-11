@@ -118,17 +118,20 @@ Each file contains two columns:
 Both are preformatted to match SEPARATE’s input requirements. You can use these files to test the interface, explore SEPARATE’s options, or verify that your installation is working correctly.
 
 
-<p align="left">
+<div align="center">
   <img src="images/fixed_example.png" alt="Fixed Interval Input Example" width="500"/>
-</p>
+  <br>
+  <em>Figure: Fixed interval usage example.</em>
+</div>
 
-*Figure: Fixed interval usage example.*
+<br>
 
-<p align="left">
+<div align="center">
   <img src="images/tips_example.png" alt="Cumulative Tips Input Example" width="500"/>
-</p>
+  <br>
+  <em>Figure: Cumulative tips usage example.</em>
+</div>
 
-*Figure: Cumulative tips usage example.*
 
 
 ### Recommended Citation
