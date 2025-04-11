@@ -25,12 +25,12 @@ SEPARATE can be used in two ways:
 
 ---
 
-### 🔹 Option 1: Precompiled Installer (Recommended)
+### Option 1: Precompiled Installer (Recommended)
 
 A precompiled Windows installer is available [here](https://usu.box.com/v/SEPARATE-download). This version includes all required dependencies and does **not** require Python to be installed.
 
 **Steps:**
-1. Download `SEPARATE_setup.exe` from xyz site.
+1. Download `SEPARATE_setup.exe` from https://usu.box.com/v/SEPARATE-download.
 2. Run the installer and follow the prompts.
 3. Launch SEPARATE from the desktop shortcut or Start Menu.
 
@@ -38,11 +38,11 @@ A precompiled Windows installer is available [here](https://usu.box.com/v/SEPARA
 
 ---
 
-### 🔹 Option 2: Run from Source Code
+###  Option 2: Run from Source Code
 
-If you prefer to run the Python source code, you can use either a **Conda** environment or **Python with pip**.
+If you prefer to run the Python source code, you can use either  a **Conda environment** or a **virtualenv with pip**..
 
-#### ▶️ Option 2A: Using Conda 
+#### Option 2A: Using Conda 
 
 1. Clone or download the repository.
 2. Open **Anaconda Prompt** and navigate to the folder.
@@ -55,12 +55,12 @@ If you prefer to run the Python source code, you can use either a **Conda** envi
     ```bash
     conda activate SEPARATE
     ```
-5. Run the code either in your IDE or crom the consol with:
+5. Run the code either in your IDE or from the terminal with:
     ```bash
-    python run_SEPARATE.py
+    python SEPARATE_GUI.py
     ```
 
-#### ▶️ Option 2B: Using pip + venv
+#### Option 2B: Using pip + venv
 
 1. Clone or download the repository.
 
@@ -79,25 +79,64 @@ If you prefer to run the Python source code, you can use either a **Conda** envi
     pip install -r requirements.txt
     ```
 
-5. 🔧 **Install PySimpleGUI v4.60.5 manually**  
-   This version is no longer hosted on PyPI, so you’ll need to install it from the wheel file provided in the `external_packages` folder (or your local path):
+5.  **Install PySimpleGUI v4.60.5 manually**  
+   This version is no longer hosted on PyPI, so you’ll need to install it from the wheel file provided in the `build_installer\PySimpleGUI-4.60.5-main.zip` folder:
 
     ```bash
     pip install external_packages/PySimpleGUI-4.60.5-py3-none-any.whl
     ```
 
-    > 💡 You can also install from a direct GitHub clone or file path if preferred.
+    > Note: You can also install from a direct GitHub clone or file path if preferred.
 
 6. Run the tool:
 
     ```bash
-    python run_SEPARATE.py
+    python SEPARATE_GUI.py
     ```
 
+## Documentation
+
+- [User Manual (PDF)](SEPARATE-User-Manual-Version1.0.pdf)
+- [Manuscript (JOSS submission)](paper/paper.md)
+- Supplementary Material in `supplementary/`
+
+## Example Datasets
+
+To help users get started quickly, we include two example datasets in the [`Example_Datasets`](Example_Datasets/) folder:
+
+| Filename                             | Description                                                                 |
+|--------------------------------------|-----------------------------------------------------------------------------|
+| `FixedInterval_TBRG_Example.xlsx`    | Synthetic dataset logged at regular intervals using fixed time steps.      |
+| `CumulativeTips_TBRG_Example.xlsx`   | Synthetic dataset with cumulative tip logging style (e.g., HOBO loggers).  |
+
+Each file contains two columns:
+1. **Timestamp** in the format `MM/DD/YY HH:MM:SS`
+2. **Rainfall Value** — either:
+   - Cumulative tip count (`Cumulative Tips` format), or
+   - Rainfall per interval (`Fixed Interval` format)
+
+Both are preformatted to match SEPARATE’s input requirements.
+
+
+<p align="left">
+  <img src="images/fixed_example.png" alt="Fixed Interval Input Example" width="500"/>
+</p>
+
+*Figure: Fixed interval usage example.*
+
+<p align="left">
+  <img src="images/tips_example.png" alt="Cumulative Tips Input Example" width="500"/>
+</p>
+
+*Figure: Cumulative tips usage example.*
+
+---
+
+You can use these files to test the interface, explore SEPARATE’s options, or verify that your installation is working correctly.
 
 ### Recommended Citation
 
-Murphy, David, JOSS 2025 [fill this in later]
+Murphy & David, JOSS, 2025, submitted
 
 ### License Information 
 MIT License
