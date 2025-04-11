@@ -48,7 +48,7 @@ If you prefer to run the Python source code, you can use either  a **Conda envir
 2. Open **Anaconda Prompt** and navigate to the folder.
 3. Create the environment:
     ```bash
-    conda env create -f SEPARATE.yml
+    conda env create -f envs/SEPARATE.yml
     ```
 
 4. Activate the environment or add the evironment to you prefered IDE
@@ -76,7 +76,7 @@ If you prefer to run the Python source code, you can use either  a **Conda envir
 4. Install required packages:
 
     ```bash
-    pip install -r requirements.txt
+    pip install -r envs/requirements.txt
     ```
 
 5.  **Install PySimpleGUI v4.60.5 manually**  
