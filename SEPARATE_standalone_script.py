@@ -1,5 +1,47 @@
+"""
+SEPARATE (Standalone Version)
+Storm Event Partitioning And Rainfall Analytics for Tipping-bucket rain gauge data Evaluation
+
+Authors:
+    Scott R. David (Utah State University)
+    Brendan P. Murphy (Simon Fraser University)
+
+Version: 1.0
+Last Updated: 2025-04-10
+License: MIT License
+
+Description:
+    This standalone version of SEPARATE processes tipping bucket rain gauge (TBRG) data to identify and
+    analyze discrete storm events. It uses a fixed minimum inter-event time (MIT) approach, with options
+    for user-defined or statistically derived separation criteria (e.g., Independent Storms Criterion).
+
+    The script is designed for batch or automated use and does not launch the graphical user interface (GUI).
+    Users must configure all input file paths, parameters, and analysis options directly within this script.
+
+Key Features:
+    - Compatible with both fixed-interval and cumulative tip rainfall records
+    - Supports user-defined or statistical storm separation criteria
+    - Calculates storm duration, magnitude, average and peak intensities
+    - Exports tabular and graphical outputs to user-defined directories
+
+Usage Notes:
+    - Edit the `filename`, `output_path`, and related input parameters below before running.
+    - Ensure required dependencies are installed (see below).
+    - Outputs will be saved in the specified directory, including summary tables and storm figures.
+
+Repository:
+    https://github.com/WatershedsWildfireResearchCollaborative/SEPARATE
+
+Dependencies:
+    Python ≥ 3.10
+    pandas, numpy, matplotlib, scipy
+
+Citation:
+    Murphy & David (2024), [add journal name and DOI when available]
+"""
+
+
 # %% import required packages
-import PySimpleGUI as sg
 import numpy as np
 from datetime import datetime
 from functions.build_SEPARATE_layout import build_SEPARATE_layout
@@ -12,64 +54,49 @@ import os
 
 software_metadata = ['SEPARATE - Summary Storm Event Output Table', 'Version 1.0 (03/01/2025)',
                      'Licensed under the MIT License.']
-# ....................Load in user inputs to variables...................
-# update the progress bar with 5 progress
-# Set the input file paths
-filename = r'C:\Users\Scott\Desktop\McDougall_South_Summer2024_Cleaned.xlsx'  # input file
-# filename = r'C:\Users\Scott\Desktop\syn_cum.xlsx'  # input file
-# optionally define sheet name
-sheetname = ''
+# ===================== USER CONFIGURATION SECTION ===================== #
+# Define all user-specified inputs here before running the script.
+# ====================================================================== #
 
-# tipping and logging data
-tip_type = 'Cumulative Tips'  # Set tip record type
-# tip_type = 'Fixed Interval'  # Set tip record type
+# --- INPUT FILE ---
+filename = r'C:\Users\Scott\Desktop\McDougall_South_Summer2024_Cleaned.xlsx'  # Path to input .xlsx or .csv file
+sheetname = ''  # (Optional) Name of sheet in Excel file; leave blank to use the first sheet
 
-tip_mag = 0.2  # set the magnitude of each tip
+# --- TIP DATA SETTINGS ---
+tip_type = 'Cumulative Tips'  # Options: 'Cumulative Tips' or 'Fixed Interval'
+tip_mag = 0.2                 # Tip volume (e.g., 0.2 mm per tip)
+tip_units = 'mm'              # Units of rainfall depth: 'mm', 'cm', or 'in'
 
-tip_units = 'mm'
+# --- STORM SEPARATION CRITERION ---
+storm_gap_type_name = 'Independent Storms Criterion (ISC)'  # Options: 'User-Defined MIT (UDM)', 'Independent Storms Criterion (ISC)'
+storm_gap = ''              # If using UDM, specify fixed inter-event time in hours
+isc_time = 48               # If using ISC, specify max inter-event time to test in hours (recommended default: 48)
 
-# storm gap partitioning data
-# storm gap type
-storm_gap_type_name = 'Independent Storms Criterion (ISC)'  # set the storm gap type
+# --- FILTERING OPTIONS ---
+min_depth_TF = False        # Apply minimum storm depth threshold? (True/False)
+min_depth = 0.2             # Minimum storm depth (same units as tip_mag); only used if min_depth_TF = True
 
-# if user defined storm gap set value
-storm_gap = ''  # set the storm gap interval
+min_duration_TF = False     # Apply minimum storm duration threshold? (True/False)
+min_duration = 0.5          # Minimum storm duration in hours; only used if min_duration_TF = True
 
-# if statistically independent storm gap set value
-isc_time = 48  # max inter-event time
+# --- OUTPUT SETTINGS ---
+output_path = r'C:\Users\Scott\Desktop\debug'  # Output folder for results
+output_name = 'hist'                           # Prefix used for output file naming
 
-# min storm depth boolean
-min_depth_TF = False
-# minimum storm depth
-min_depth = 0.2
+plt_ext = '.png'           # Plot image format: '.png', '.jpg', '.eps', or '.pdf'
+plot_start_date = ''       # Optional: Limit plots to start on this date ('YYYY-MM-DD'), or leave blank
+plot_end_date = ''         # Optional: Limit plots to end on this date ('YYYY-MM-DD'), or leave blank
 
-# min storm duration boolean
-min_duration_TF = False
-# minimum storm duration
-min_duration = 0.5
+data_opt = True            # Save raw & interpolated storm data for each event? (True/False)
+plot_opt = True            # Generate storm plots? (True/False)
+plot_int = 15              # Storm intensity duration to use for peak intensity plot/profile (in minutes)
 
-# output options
-output_path = r'C:\Users\Scott\Desktop\debug'
-
-output_name = 'hist'
-
-plt_ext = '.png'
-
-plot_start_date = ''
-
-plot_end_date = ''
-
-data_opt = True
-
-plot_opt = True
-
-plot_int = 15
 
 # ....................Adjust naming conventions and inputs...................
 # Adjust some parameter names to make them shorter
 if storm_gap_type_name == 'User-Defined MIT (UDM)':
     storm_gap_type = 'UDM'
-elif storm_gap_type_name == 'Travel Time Criterion (TTC)':
+elif storm_gap_type_name == 'Travel Time Criterion (TTC)': # note this is not implemented yet
     storm_gap_type = 'RTTC'
 elif storm_gap_type_name == 'Independent Storms Criterion (ISC)':
     storm_gap_type = 'ISC'
@@ -80,6 +107,7 @@ elif storm_gap_type_name == 'Independent Storms Criterion (ISC)':
         result in slower processing times. Conversely, while using values less than the default value of 
         48 hours may increase processing times, this can also lead to poorer fits and lower confidence in the selection of the MIT
         """
+        print(isc_warning)
     #     sg.popup_no_wait(isc_warning, title="Warning",text_color='black', background_color='white',
     #              button_color=('black', 'lightblue'))
 
@@ -103,6 +131,7 @@ if plot_start_date:
         datetime.strptime(plot_start_date, '%Y-%m-%d').date()
     except:
         error_msg_dates = "Input date formats can not be interpreted please input date as YYYY-MM-DD "
+        raise ValueError(error_msg_dates)
         # sg.popup_error(error_msg_dates, title='Invalid Dates', text_color='black',
         #                background_color='white', button_color=('black', 'lightblue'))
         tf_date = False
@@ -112,6 +141,8 @@ if plot_end_date:
         datetime.strptime(plot_end_date, '%Y-%m-%d').date()
     except:
         error_msg_dates = "Input date formats can not be interpreted please input date as YYYY-MM-DD "
+        raise ValueError(error_msg_dates)
+
         # sg.popup_error(error_msg_dates, title='Invalid Dates', text_color='black',
         #                background_color='white', button_color=('black', 'lightblue'))
         tf_date = False
@@ -124,16 +155,13 @@ if plot_end_date:
 #Read-in Data & Process TBRG Data
 tip_datetime, tip_depth, logging_interval, start_date, end_date = sf.separate_preprocessing(filename, sheetname, tip_type, tip_mag)
 
-# df, c = sf.load_data(filename, sheetname)
-# # filename =r'C:\Users\Scott\Desktop\High_Data_Rainstorm.xlsx'
-#
-# # Assuming df is your DataFrame and c[0] is the column of interest
-# df[c[0]] = pd.to_datetime(df[c[0]], errors='coerce')
-#
-# # Create Timestamp Record of Tips:
-# timestamp_date, cum_rainfall, errmsg = sf.create_time_stamp_record(df, c, tip_type, tip_mag)
+# check that the input data is consistent with the user input tip type
+# tip_is_valid, inferred = su.validate_tip_type(tip_datetime, tip_type)
+valid_tip, inferred_tip, raw_datetime = su.validate_tip_type_from_raw_file(filename, sheetname,
+                                                                           tip_type)
 
-
+if not valid_tip:
+    print(f"Tip type mismatch.\nYou selected '{tip_type}', but SEPARATE inferred '{inferred_tip}'")
 
 # update progress bar
 
@@ -148,16 +176,15 @@ if storm_gap_type == 'ISC':
             "IC Upper Limit Error: Testing inter-event intervals greater than 500 hours are "
             "not currently allowed in SEPARATE. Reduce the time of your upper limit."
         )
-        sg.popup_error(ic_error, title='Error', text_color='black', background_color='white',
-                       button_color=('black', 'lightblue'))
+        raise ValueError(ic_error)
+
 
     if isc_t_max <= 1:
         low_ic_error = (
             "IC Upper Limit Error: Testing inter-event intervals less than or equal to 1 hour are "
-            "not currently allowed in SEPARATE. Increase the time of your upper limit."
-        )
-        sg.popup_error(low_ic_error, title='Error', text_color='black', background_color='white',
-                       button_color=('black', 'lightblue'))
+            "not currently allowed in SEPARATE. Increase the time of your upper limit.")
+        raise ValueError(low_ic_error)
+
 
     # create folder for output plot
     gap_plots_folder = output_name + '_ISC_analysis'
@@ -212,8 +239,8 @@ I_intervals = I_intervals / 60.0  # Convert Intensity Intervals to Hours
 if len(I_intervals_chk) < 1:
     errmsg = ("Logging interval is greater than storm intensity intervals.\nPlease specify a user "
               "defined interval that is longer than the logging intervals.")
-    sg.popup_error(errmsg, title='Error', text_color='black', background_color='white',
-                   button_color=('black', 'lightblue'))
+    raise ValueError(errmsg)
+
 if plot_opt:
     plots_folder = output_name + '_storm_plots'
     plots_path = os.path.join(output_path, plots_folder)
@@ -299,8 +326,18 @@ for i in range(N_storms):
         combined_record[key_time] = peakiD_all[idx][2]
     storm_record.append(combined_record)
 
+# build header for output files
+if tip_type == 'Cumulative Tips':  # if cumulative tips then no logging interval
+    logging_interval = 'N/A'
 
-# Generate output excel file
+# if min duration is not provided write N/A to header
+if not min_duration_TF:
+    min_duration = 'N/A'
+
+# if min depth is not provided write N/A to header
+if not min_depth_TF:
+    min_depth = 'N/A'
+
 # build header for output files
 header_parameters = {
     'Dataset ID:': f'{output_name}',
@@ -309,10 +346,10 @@ header_parameters = {
     'Tipping Bucket Record Type:': f'{tip_type}',
     'Tip Magnitude:': f'{tip_mag}',
     'Tip Units:': f'{tip_units}',
-    'Logging Interval (min):': f'{logging_interval}', # should make this only included it fixed logging interval
+    'Logging Interval (min):': f'{logging_interval}',
     'Fixed MIT Selection Criterion:': f'{storm_gap_type_name}',
     'Minimum Inter-Event Time (hours):': f'{np.round(Fixed_MIT, 2)}',
-    'Number of Storms in Record:': f'{total_storms}',
+    'Total Number of Storms in Record:': f'{total_storms}',
     'Number of Storms Suppressed:': f'{suppressed_storms}',
     f'Minimum Storm Depth ({tip_units}):': f'{min_depth}',
     f'Minimum Storm Duration (hrs):': f'{min_duration}',
@@ -376,9 +413,7 @@ output=output.reindex(columns=columns)
 # check that all values are not nan
 if output[f'Peak_i{int(60 * I_intervals[0])}'].isnull().all(): # np.all(np.isnan(output[f'Peak_i{int(60 * I_intervals[0])}'])):
     errmsg = 'Rainfall Intensity Interval Greater Than All Storm Durations\n'
-    sg.popup_error(errmsg, title='Error', text_color='black', background_color='white',
-                   button_color=('black', 'lightblue'))
-    # raise ValueError(errmsg)
+    raise ValueError(errmsg)
 else:
     errmsg = None
 
