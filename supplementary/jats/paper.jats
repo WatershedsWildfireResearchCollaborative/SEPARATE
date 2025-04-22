@@ -380,20 +380,21 @@ a Creative Commons Attribution 4.0 International License (CC BY
   storm. Finally, users can select one intensity duration of interest,
   and SEPARATE will optionally include the full intensity profile
   (tabular and/or graphical) with the outputs.</p>
-  <p><inline-graphic mimetype="image" mime-subtype="png" xlink:href="FigureS4.png">
-    <alt-text>Conceptual example illustrating SEPARATE’s core analytical
-    steps, here based on a fixed interval TBRG rainfall record. These
-    steps include: A) storm event identification using a fixed minimum
-    inter-event time (MIT), B) the generation of the cumulative rainfall
-    profile from the tipping bucket data, C) the densification of the
-    cumulative rainfall profile to 1-minute timesteps for rainfall
-    intensity analysis, and D) the application of a backward-differenced
-    moving window over the 1-minute interval cumulative rainfall profile
-    to generate a rainfall intensity profile of a given duration (with
-    i5 shown) to determine the timing and magnitude of the peak in a
-    given storm.</alt-text>
-  </inline-graphic>
-  {width=80%}<styled-content id="figU003AFigureS4"></styled-content></p>
+  <fig>
+    <caption><p>Conceptual example illustrating SEPARATE’s core
+    analytical steps, here based on a fixed interval TBRG rainfall
+    record. These steps include: A) storm event identification using a
+    fixed minimum inter-event time (MIT), B) the generation of the
+    cumulative rainfall profile from the tipping bucket data, C) the
+    densification of the cumulative rainfall profile to 1-minute
+    timesteps for rainfall intensity analysis, and D) the application of
+    a backward-differenced moving window over the 1-minute interval
+    cumulative rainfall profile to generate a rainfall intensity profile
+    of a given duration (with i5 shown) to determine the timing and
+    magnitude of the peak in a given storm.
+    <styled-content id="figU003AFigureS4"></styled-content></p></caption>
+    <graphic mimetype="image" mime-subtype="png" xlink:href="FigureS4.png" />
+  </fig>
 </sec>
 <sec id="output-options">
   <title>Output Options</title>
