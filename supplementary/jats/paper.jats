@@ -95,23 +95,22 @@ a Creative Commons Attribution 4.0 International License (CC BY
   required to select which record type they are inputting from a
   drop-down menu. The GUI also has required inputs for the equivalent
   rainfall depth of each tip along with the corresponding units (mm, cm,
-  inches) – parameters specific to the make and model of TBRG.</p>
+  inches) - parameters specific to the make and model of TBRG.</p>
   <p>Finally, users must browse to and select their input data file of
   unprocessed TBRG rainfall data. The selected file must be either a
-  formatted Excel spreadsheet (<monospace>.xlsx</monospace>) or
-  comma-delimited text file (<monospace>.csv</monospace>) that includes
-  two columns of data assumed to have a single row of headers (though
-  the header information is not read or used in any way in the
-  analysis).</p>
+  formatted Excel spreadsheet (‘.xlsx’) or comma-delimited text file
+  (‘.csv’) that includes two columns of data assumed to have a single
+  row of headers (though the header information is not read or used in
+  any way in the analysis).</p>
   <p>For both record types, the first column must be the logged
   datetimes using slash delimiters for the date, colon delimiters for
-  time, and formatted as <monospace>MM/DD/YY HH:MM:SS</monospace>. For
-  fixed interval loggers, the second column should include the
-  cumulative rainfall recorded over the logging interval, while for
-  event-based loggers, this column should include a cumulative count of
-  the tips from the start of the record. The required datetime and
-  logging data formatting is designed to be consistent with the tabular
-  outputs from common commercially available TBRG loggers.</p>
+  time, and formatted as ‘MM/DD/YY HH:MM:SS’. For fixed interval
+  loggers, the second column should include the cumulative rainfall
+  recorded over the logging interval, while for event-based loggers,
+  this column should include a cumulative count of the tips from the
+  start of the record. The required datetime and logging data formatting
+  is designed to be consistent with the tabular outputs from common
+  commercially available TBRG loggers.</p>
   <p>For users of Onset brand HOBO rain gauges and data loggers (e.g.,
   HOBO RG3-M with pendant event logger or HOBO S-RGB-M002 with an
   external data logger), the SEPARATE manual provides instructions about
@@ -189,7 +188,7 @@ a Creative Commons Attribution 4.0 International License (CC BY
   assumption of independence, the inter-event times of storms should
   follow an exponential distribution
   (<xref alt="[fig:FigureS1]" rid="figU003AFigureS1">[fig:FigureS1]</xref>).</p>
-  <fig id="figU003AFigureS1">
+  <fig>
     <caption><p>Example graphical output included when SEPARATE is run
     using the independent storm criterion. The graph includes the
     probability distribution of inter-storm times following event
@@ -199,7 +198,7 @@ a Creative Commons Attribution 4.0 International License (CC BY
     times. This output provides users the opportunity to visually assess
     the validity of the assumption that the data in their rainfall
     record represents a Poisson process with completely random arrival
-    times.</p></caption>
+    times.<styled-content id="figU003AFigureS1"></styled-content></p></caption>
     <graphic mimetype="image" mime-subtype="png" xlink:href="FigureS1.png" />
   </fig>
   <p>Determining the MIT value that meets this criterion is therefore
@@ -218,11 +217,12 @@ a Creative Commons Attribution 4.0 International License (CC BY
   deviation of the time between storms identified and separated based on
   each test interval (i.e., the distribution of inter-event times, or
   IET).</p>
-  <fig id="figU003AFigureS2">
+  <fig>
     <caption><p>Example graphical output from SEPARATE when rainfall
     analysis is conducted using the independent storms criterion (ISC).
     These figures can be used to visually confirm that the selected MIT
-    occurs where CV = 1.</p></caption>
+    occurs where CV =
+    1.<styled-content id="figU003AFigureS2"></styled-content></p></caption>
     <graphic mimetype="image" mime-subtype="png" xlink:href="FigureS2.png" />
   </fig>
   <p>By default, SEPARATE tests inter-event intervals over a range of
@@ -240,14 +240,14 @@ a Creative Commons Attribution 4.0 International License (CC BY
   The upper value can be set to any integer value between 1 and 500
   hours, but increasing this value above the default of 48 hours will
   increase SEPARATE’s run time.</p>
-  <fig id="figU003AFigureS3">
+  <fig>
     <caption><p>Example graphical output from SEPARATE when rainfall
     analysis is conducted using the independent storms criterion (ISC),
     showing the fraction of all the storms identified for a given test
     interval that were ultimately included versus suppressed from the
     analysis based on the inclusion of additional criteria defined by
     the user. The vertical dashed black line shows the selected MIT for
-    reference.</p></caption>
+    reference.<styled-content id="figU003AFigureS3"></styled-content></p></caption>
     <graphic mimetype="image" mime-subtype="png" xlink:href="FigureS3.png" />
   </fig>
   <p>The final option in the Partitioning Criteria section of the GUI
@@ -285,8 +285,8 @@ a Creative Commons Attribution 4.0 International License (CC BY
   on the user-defined input, SEPARATE then partitions storms in the
   rainfall record
   (<xref alt="[fig:FigureS4]" rid="figU003AFigureS4">[fig:FigureS4]</xref>A).
-  For each identified storm, SEPARATE then extracts the start time and
-  end time, then calculates the storm duration, total magnitude of
+  For each identified storm, SEPARATE extracts the start time and end
+  time, and then calculates the storm duration, total magnitude of
   rainfall, and the average storm intensity
   (<xref alt="[fig:FigureS4]" rid="figU003AFigureS4">[fig:FigureS4]</xref>B).
   All rainfall metrics reported by SEPARATE use the same units as the
@@ -380,20 +380,20 @@ a Creative Commons Attribution 4.0 International License (CC BY
   storm. Finally, users can select one intensity duration of interest,
   and SEPARATE will optionally include the full intensity profile
   (tabular and/or graphical) with the outputs.</p>
-  <fig id="figU003AFigureS4">
-    <caption><p>Conceptual example illustrating SEPARATE’s core
-    analytical steps, here based on a fixed interval TBRG rainfall
-    record. These steps include: A) storm event identification using a
-    fixed minimum inter-event time (MIT), B) the generation of the
-    cumulative rainfall profile from the tipping bucket data, C) the
-    densification of the cumulative rainfall profile to 1-minute
-    timesteps for rainfall intensity analysis, and D) the application of
-    a backward-differenced moving window over the 1-minute interval
-    cumulative rainfall profile to generate a rainfall intensity profile
-    of a given duration (with i5 shown) to determine the timing and
-    magnitude of the peak in a given storm.</p></caption>
-    <graphic mimetype="image" mime-subtype="png" xlink:href="FigureS4.png" />
-  </fig>
+  <p><inline-graphic mimetype="image" mime-subtype="png" xlink:href="FigureS4.png">
+    <alt-text>Conceptual example illustrating SEPARATE’s core analytical
+    steps, here based on a fixed interval TBRG rainfall record. These
+    steps include: A) storm event identification using a fixed minimum
+    inter-event time (MIT), B) the generation of the cumulative rainfall
+    profile from the tipping bucket data, C) the densification of the
+    cumulative rainfall profile to 1-minute timesteps for rainfall
+    intensity analysis, and D) the application of a backward-differenced
+    moving window over the 1-minute interval cumulative rainfall profile
+    to generate a rainfall intensity profile of a given duration (with
+    i5 shown) to determine the timing and magnitude of the peak in a
+    given storm.</alt-text>
+  </inline-graphic>
+  {width=80%}<styled-content id="figU003AFigureS4"></styled-content></p>
 </sec>
 <sec id="output-options">
   <title>Output Options</title>
@@ -422,63 +422,63 @@ a Creative Commons Attribution 4.0 International License (CC BY
       <tbody>
         <tr>
           <td>Dataset ID</td>
-          <td><monospace>[OutputPrefix]</monospace></td>
+          <td>‘[OutputPrefix]’</td>
         </tr>
         <tr>
           <td>Record Start Date</td>
-          <td><monospace>YYYY-MM-DD</monospace></td>
+          <td>‘YYYY-MM-DD’</td>
         </tr>
         <tr>
           <td>Record End Date</td>
-          <td><monospace>YYYY-MM-DD</monospace></td>
+          <td>‘YYYY-MM-DD’</td>
         </tr>
         <tr>
           <td>Tipping Bucket Record Type</td>
-          <td><monospace>[Fixed Interval or Cumulative Tips]</monospace></td>
+          <td>‘[Fixed Interval or Cumulative Tips]’</td>
         </tr>
         <tr>
           <td>Tip Magnitude</td>
-          <td><monospace>[user input]</monospace></td>
+          <td>‘[user input]’</td>
         </tr>
         <tr>
           <td>Tip Units</td>
-          <td><monospace>[user input]</monospace></td>
+          <td>‘[user input]’</td>
         </tr>
         <tr>
           <td>Logging Interval (min)</td>
-          <td><monospace>[if fixed interval]</monospace></td>
+          <td>‘[if fixed interval]’</td>
         </tr>
         <tr>
           <td>Fixed MIT Selection Criterion</td>
-          <td><monospace>[user selection]</monospace></td>
+          <td>‘[user selection]’</td>
         </tr>
         <tr>
           <td>Minimum Inter-Event Time (hours)</td>
-          <td><monospace>[criterion dependent]</monospace></td>
+          <td>‘[criterion dependent]’</td>
         </tr>
         <tr>
           <td>Total Number of Storms in Record</td>
-          <td><monospace>XXX</monospace></td>
+          <td>‘XXX’</td>
         </tr>
         <tr>
           <td>Number of Storms Suppressed</td>
-          <td><monospace>XXX</monospace></td>
+          <td>‘XXX’</td>
         </tr>
         <tr>
           <td>Minimum Storm Depth (mm)</td>
-          <td><monospace>[optional user input]</monospace></td>
+          <td>‘[optional user input]’</td>
         </tr>
         <tr>
           <td>Minimum Storm Duration (hrs)</td>
-          <td><monospace>[optional user input]</monospace></td>
+          <td>‘[optional user input]’</td>
         </tr>
         <tr>
           <td>Record Separated On</td>
-          <td><monospace>YYYY-MM-DD</monospace></td>
+          <td>‘YYYY-MM-DD’</td>
         </tr>
         <tr>
           <td>Data Input File</td>
-          <td><monospace>C:/… filepath</monospace></td>
+          <td>‘C:/… filepath’</td>
         </tr>
       </tbody>
     </table>
@@ -504,20 +504,19 @@ a Creative Commons Attribution 4.0 International License (CC BY
         <tr>
           <td>StormID</td>
           <td>auto-generated IDs formatted as:
-          <monospace>[OutputPrefix]_YYYY-MM-DD</monospace><italic>(Note:
-          if more than one storm per date, then ID receives additional
-          suffix with storm number, e.g.,
-          <monospace>[OutputPrefix]_YYYY-MM-DD_2</monospace>)</italic></td>
+          ’[OutputPrefix]_YYYY-MM-DD’*(Note: if more than one storm per
+          date, then ID receives additional suffix with storm number,
+          e.g., ’[OutputPrefix]_YYYY-MM-DD_2’)*</td>
         </tr>
         <tr>
           <td>Start</td>
-          <td>date and time of first storm tip
-          (<monospace>YYYY-MM-DD HH:MM:SS</monospace>)</td>
+          <td>date and time of first storm tip (‘YYYY-MM-DD
+          HH:MM:SS’)</td>
         </tr>
         <tr>
           <td>End</td>
-          <td>date and time of last storm tip
-          (<monospace>YYYY-MM-DD HH:MM:SS</monospace>)</td>
+          <td>date and time of last storm tip (‘YYYY-MM-DD
+          HH:MM:SS’)</td>
         </tr>
         <tr>
           <td>Duration</td>
@@ -561,63 +560,58 @@ a Creative Commons Attribution 4.0 International License (CC BY
         <tr>
           <td>Peak_i5_time</td>
           <td>date and time of peak 5-minute storm intensity
-          (<monospace>YYYY-MM-DD HH:MM:SS</monospace>)</td>
+          (‘YYYY-MM-DD HH:MM:SS’)</td>
         </tr>
         <tr>
           <td>Peak_i10_time</td>
           <td>date and time of peak 10-minute storm intensity
-          (<monospace>YYYY-MM-DD HH:MM:SS</monospace>)</td>
+          (‘YYYY-MM-DD HH:MM:SS’)</td>
         </tr>
         <tr>
           <td>Peak_i15_time</td>
           <td>date and time of peak 15-minute storm intensity
-          (<monospace>YYYY-MM-DD HH:MM:SS</monospace>)</td>
+          (‘YYYY-MM-DD HH:MM:SS’)</td>
         </tr>
         <tr>
           <td>Peak_i30_time</td>
           <td>date and time of peak 30-minute storm intensity
-          (<monospace>YYYY-MM-DD HH:MM:SS</monospace>)</td>
+          (‘YYYY-MM-DD HH:MM:SS’)</td>
         </tr>
         <tr>
           <td>Peak_i60_time</td>
           <td>date and time of peak 60-minute storm intensity
-          (<monospace>YYYY-MM-DD HH:MM:SS</monospace>)</td>
+          (‘YYYY-MM-DD HH:MM:SS’)</td>
         </tr>
       </tbody>
     </table>
   </table-wrap>
   <p>Every analysis by SEPARATE also includes three output figures,
   saved as image files in a format selected by the user from a drop-down
-  menu in the GUI (<monospace>.png</monospace>,
-  <monospace>.eps</monospace>, <monospace>.jpg</monospace>, or
-  <monospace>.pdf</monospace>). These files are saved to the same output
-  folder as the Excel file and use the same filename prefix. The three
-  default figures include:</p>
-  <p><inline-graphic id="figU003AFigureEA" mimetype="image" mime-subtype="png" xlink:href="FigureEA.png">
-    <alt-text>Figure EA</alt-text>
+  menu in the GUI (‘.png’, ‘.eps’, ‘.jpg’, or ‘.pdf’). These files are
+  saved to the same output folder as the Excel file and use the same
+  filename prefix. The three default figures include:</p>
+  <p><inline-graphic mimetype="image" mime-subtype="png" xlink:href="FigureEA.png">
+    <alt-text>Figure EA.</alt-text>
   </inline-graphic> <bold>Example Figure A</bold>: Histograms displaying
   the distribution of storm durations, magnitudes, and average
   intensities of all identified storms in the rainfall record
-  (<italic>Filename:</italic>
-  <monospace>[OutputPrefix]_summary_plot</monospace>).</p>
-  <p><inline-graphic id="figU003AFigureEB" mimetype="image" mime-subtype="png" xlink:href="FigureEB.png">
-    <alt-text>Figure EB</alt-text>
+  (<italic>Filename:</italic> ’[OutputPrefix]_summary_plot’).</p>
+  <p><inline-graphic mimetype="image" mime-subtype="png" xlink:href="FigureEB.png">
+    <alt-text>Figure EB.</alt-text>
   </inline-graphic> <bold>Example Figure B</bold>: Timeseries plot of
   cumulative rainfall and storm magnitudes of all storms contained in
   the rainfall record (<italic>Filename:</italic>
-  <monospace>[OutputPrefix]_magnitude_cumulative_rainfall_full</monospace>).</p>
-  <p><inline-graphic id="figU003AFigureEC" mimetype="image" mime-subtype="png" xlink:href="FigureEC.png">
-    <alt-text>Figure EC</alt-text>
+  ’[OutputPrefix]_magnitude_cumulative_rainfall_full’).</p>
+  <p><inline-graphic mimetype="image" mime-subtype="png" xlink:href="FigureEC.png">
+    <alt-text>Figure EC.</alt-text>
   </inline-graphic> <bold>Example Figure C</bold>: Timeseries of the
   storm magnitudes (blue bars) and associated peak storm intensities
-  (black scatter points) of a user-specified duration
-  (<monospace>i5</monospace>, <monospace>i10</monospace>,
-  <monospace>i15</monospace>, <monospace>i30</monospace>, or
-  <monospace>i60</monospace>) for all identified storms
+  (black scatter points) of a user-specified duration (‘i5’, ‘i10’,
+  ‘i15’, ‘i30’, or ‘i60’) for all identified storms
   (<italic>Filename:</italic>
-  <monospace>[OutputPrefix]_magnitude_rainfall_intensity_full</monospace>).
-  <italic>Note: Storms suppressed due to user-defined additional
-  criteria (e.g., minimum storm depth) are not shown in the timeseries
+  ’[OutputPrefix]_magnitude_rainfall_intensity_full’). <italic>Note:
+  Storms suppressed due to user-defined additional criteria (e.g.,
+  minimum storm depth) are not shown in the timeseries
   plots.</italic></p>
   <p>Users can also optionally select (via checkboxes in the GUI) to
   output data and/or graphs of the cumulative rainfall and rainfall
@@ -628,14 +622,11 @@ a Creative Commons Attribution 4.0 International License (CC BY
   ID identified in the summary table. Each storm data sheet includes the
   tip or interval datetimes, the cumulative storm time and rainfall, and
   the densified storm intensity profile of a user-specified duration
-  (<monospace>i5</monospace>, <monospace>i10</monospace>,
-  <monospace>i15</monospace>, <monospace>i30</monospace>, or
-  <monospace>i60</monospace>).</p>
+  (‘i5’, ‘i10’, ‘i15’, ‘i30’, or ‘i60’).</p>
   <p>If the graphical output option is selected, SEPARATE outputs will
   also include graphical profiles for each identified storm event. These
   figures are all saved to a subfolder (named:
-  <monospace>[OutputPrefix]_storm_plots</monospace>) within the main
-  outputs folder.</p>
+  ’[OutputPrefix]_storm_plots’) within the main outputs folder.</p>
   <p>Each image file is named using its storm ID as the prefix and
   displays the cumulative rainfall profile (in blue) and rainfall
   intensity at the user-specified duration (in red), as well as
@@ -643,9 +634,10 @@ a Creative Commons Attribution 4.0 International License (CC BY
   the specified duration is identified in the graph with a red dot, and
   the associated time is noted in the annotations
   (<xref alt="[fig:FigureS5]" rid="figU003AFigureS5">[fig:FigureS5]</xref>).</p>
-  <fig id="figU003AFigureS5">
+  <fig>
     <caption><p>Example of a graphical storm profile, which can
-    optionally be generated as outputs from SEPARATE.</p></caption>
+    optionally be generated as outputs from
+    SEPARATE.<styled-content id="figU003AFigureS5"></styled-content></p></caption>
     <graphic mimetype="image" mime-subtype="png" xlink:href="FigureS5.png" />
   </fig>
 </sec>
