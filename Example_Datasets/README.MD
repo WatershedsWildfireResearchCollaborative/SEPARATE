@@ -19,7 +19,7 @@ Both are preformatted to match SEPARATE’s input requirements. You can use thes
 In the ouputs folder, you can find the results from each of these runs below, using a 15-min. storm intensity for plotting. 
 
 <div align="center">
-  <img src="images/fixed_example.png" alt="Fixed Interval Input Example" width="500"/>
+  <img src="../images/fixed_example.png" alt="Fixed Interval Input Example" width="500"/>
   <br>
   <em>Figure: Fixed interval usage example.</em>
 </div>
@@ -27,7 +27,7 @@ In the ouputs folder, you can find the results from each of these runs below, us
 <br>
 
 <div align="center">
-  <img src="images/tips_example.png" alt="Cumulative Tips Input Example" width="500"/>
+  <img src="../images/tips_example.png" alt="Cumulative Tips Input Example" width="500"/>
   <br>
   <em>Figure: Cumulative tips usage example.</em>
 </div>
