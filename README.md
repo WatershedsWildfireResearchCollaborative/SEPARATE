@@ -115,7 +115,7 @@ Each file contains two columns:
    - Cumulative tip count (`Cumulative Tips` format), or
    - Rainfall per interval (`Fixed Interval` format)
 
-Both are preformatted to match SEPARATE’s input requirements. You can use these files to test the interface, explore SEPARATE’s options, or verify that your installation is working correctly.
+Both are preformatted to match SEPARATE’s input requirements. You can use these files to test the interface, explore SEPARATE’s options, or verify that your installation is working correctly. In the Example_Datasets/Ouputs folder, you can find the results from each of these runs below, using a 15-min. storm intensity for plotting.
 
 
 <div align="center">
