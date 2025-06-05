@@ -2,6 +2,7 @@
 <p align="center">
   <img src="../images/header.png" alt="SEPARATE Banner" width="600"/>
 </p>
+
 ## Example Datasets
 
 To help users get started quickly, we include two example datasets in the [`Example_Datasets`](Example_Datasets/) folder:
