@@ -358,7 +358,7 @@ def build_SEPARATE_layout():
         [sg.Checkbox("Include Graphical Storm Event Profiles", key="plot_opt", default=True, font=label_font,
                  text_color=header_color, background_color=background_color)],
 
-        [sg.Text("Intensity Interval for Storm Profiles", size=(27, 1), font=label_font, text_color=header_color,
+        [sg.Text("Intensity Interval for Storm Profiles", size=(28, 1), font=label_font, text_color=header_color,
                  background_color=background_color),
         sg.Combo([5, 10, 15, 30, 60], key="plot_int", size=(5, 1), font=input_font, readonly=True,
                   button_background_color=button_bg, default_value=15, background_color=box_color),
