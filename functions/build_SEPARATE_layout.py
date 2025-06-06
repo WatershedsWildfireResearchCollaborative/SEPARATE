@@ -39,7 +39,7 @@ def build_SEPARATE_layout():
     help_messages = build_help_dialogue()
 
     # set path for info button log
-    info_button = resource_path(os.path.join("images\info_button.png"))
+    info_button = resource_path(os.path.join("images/info_button.png"))
 
     pad1 =((30, 0), (0, 0))
     pad2 =((60, 0), (0, 0))
@@ -47,7 +47,7 @@ def build_SEPARATE_layout():
 
 
     #%% Header
-    header_path = resource_path(os.path.join("images\header.png"))
+    header_path = resource_path(os.path.join("images/header.png"))
     gui_header = [
         [sg.Image(header_path, pad=((0, 0), (0, 10)))]
     ]
@@ -379,8 +379,8 @@ def build_SEPARATE_layout():
     # execution
     blank_text = [[sg.Text('', font=label_font, background_color=background_color,
                            text_color=text_color)]]
-    partition_data = [[sg.Column([[sg.Button('Separate Storms', button_color=button_color, size=(12, 2),
-                                            font=button_font)]], justification='center')]]
+    partition_data = [[sg.Column([[sg.Button('Separate Storms', button_color=button_color, size=(13, 2),
+                                            font=button_font)]], justification='center')]] #, pad=(10,10)
     progress_text = [[sg.Text('Partitioning Progress:', font=label_font, background_color=background_color,
                              text_color=text_color)]]
     progress_bar = [[sg.ProgressBar(100, orientation='h', expand_x=True, size=(20, 20), key='PBAR')]]
