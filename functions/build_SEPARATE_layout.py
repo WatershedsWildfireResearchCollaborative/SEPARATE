@@ -358,7 +358,7 @@ def build_SEPARATE_layout():
         [sg.Checkbox("Include Graphical Storm Event Profiles", key="plot_opt", default=True, font=label_font,
                  text_color=header_color, background_color=background_color)],
 
-        [sg.Text("Intensity Interval for Storm Profiles", size=(25, 1), font=label_font, text_color=header_color,
+        [sg.Text("Intensity Interval for Storm Profiles", size=(27, 1), font=label_font, text_color=header_color,
                  background_color=background_color),
         sg.Combo([5, 10, 15, 30, 60], key="plot_int", size=(5, 1), font=input_font, readonly=True,
                   button_background_color=button_bg, default_value=15, background_color=box_color),
@@ -379,7 +379,7 @@ def build_SEPARATE_layout():
     # execution
     blank_text = [[sg.Text('', font=label_font, background_color=background_color,
                            text_color=text_color)]]
-    partition_data = [[sg.Column([[sg.Button('Separate Storms', button_color=button_color, size=(13, 2),
+    partition_data = [[sg.Column([[sg.Button('Separate Storms', button_color=button_color, size=(14, 2),
                                             font=button_font)]], justification='center')]] #, pad=(10,10)
     progress_text = [[sg.Text('Partitioning Progress:', font=label_font, background_color=background_color,
                              text_color=text_color)]]

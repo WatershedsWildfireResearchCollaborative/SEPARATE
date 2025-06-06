@@ -32,7 +32,7 @@
     "com.codeium.enabled": "true",
     "git-widget-placeholder": "main",
     "ignore.virus.scanning.warn.message": "true",
-    "last_opened_file_path": "C:/Github/WWRC/SEPARATE",
+    "last_opened_file_path": "D:/GitHub/WWRC/SEPARATE",
     "node.js.detected.package.eslint": "true",
     "node.js.detected.package.tslint": "true",
     "node.js.selected.package.eslint": "(autodetect)",
@@ -43,6 +43,7 @@
 }]]></component>
   <component name="RecentsManager">
     <key name="CopyFile.RECENT_KEYS">
+      <recent name="D:\GitHub\WWRC\SEPARATE" />
       <recent name="C:\Github\WWRC\SEPARATE" />
     </key>
   </component>
@@ -70,6 +71,7 @@
       <workItem from="1744244210842" duration="1925000" />
       <workItem from="1744332093752" duration="1308000" />
       <workItem from="1749236305998" duration="2572000" />
+      <workItem from="1749240481806" duration="569000" />
     </task>
     <servers />
   </component>
@@ -77,6 +79,6 @@
     <option name="version" value="3" />
   </component>
   <component name="com.intellij.coverage.CoverageDataManagerImpl">
-    <SUITE FILE_PATH="coverage/SEPARATE$SEPARATE_GUI.coverage" NAME="SEPARATE_GUI Coverage Results" MODIFIED="1749238369985" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="false" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$" />
+    <SUITE FILE_PATH="coverage/SEPARATE$SEPARATE_GUI.coverage" NAME="SEPARATE_GUI Coverage Results" MODIFIED="1749241010988" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="false" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$" />
   </component>
 </project>
