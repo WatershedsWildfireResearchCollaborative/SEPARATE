@@ -6,15 +6,17 @@ from functions.build_help_dialogue import build_help_dialogue
 
 # helper function taken from here
 # https://stackoverflow.com/questions/31836104/pyinstaller-and-onefile-how-to-include-an-image-in-the-exe-file
-def resource_path(relative_path):  # fixes paths for pyintaller
-    """Fixes paths for PyInstaller; otherwise returns absolute path."""
-    try:
-        # PyInstaller creates a temp folder and stores path in _MEIPASS
-        base_path = sys._MEIPASS2
-    except Exception:
+def resource_path(relative_path):
+    """Get absolute path to resource, works for dev and PyInstaller bundles."""
+    if getattr(sys, 'frozen', False):
+        # Try PyInstaller's official _MEIPASS first, then fallback to _MEIPASS2 if present
+        base_path = getattr(sys, '_MEIPASS', getattr(sys, '_MEIPASS2', os.path.abspath(".")))
+    else:
+        # fall back if both meipass and meipass2 are not present
         base_path = os.path.abspath(".")
 
     return os.path.join(base_path, relative_path)
+
 
 
 def build_SEPARATE_layout():
