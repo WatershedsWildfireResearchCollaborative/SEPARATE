@@ -5,8 +5,7 @@
 
 ## Example Datasets
 
-To help users get started quickly, we include two example datasets in the [`Example_Datasets`](Example_Datasets/) folder:
-
+To help users get started quickly, we include two example datasets:
 | Filename                             | Description                                                                 |
 |--------------------------------------|-----------------------------------------------------------------------------|
 | `FixedInterval_TBRG_Example.xlsx`    | Example dataset logged at regular intervals using fixed time steps.      |
@@ -18,8 +17,10 @@ Each file contains two columns:
    - Cumulative tip count (`Cumulative Tips` format), or
    - Rainfall per interval (`Fixed Interval` format)
 
-Both are preformatted to match SEPARATE’s input requirements. You can use these files to test the interface, explore SEPARATE’s options, or verify that your installation is working correctly.
+Both files are preformatted to match SEPARATE’s input requirements. You can use them to test the interface, explore SEPARATE’s options, or verify that your installation is working correctly.
+
 In the ouputs folder, you can find the results from each of these runs below, using a 15-min. storm intensity for plotting. 
+The [`Outputs`](./Outputs) folder contains the results from running both datasets with a 15-minute storm intensity threshold for plotting.
 
 <div align="center">
   <img src="../images/fixed_example.png" alt="Fixed Interval Input Example" width="500"/>
@@ -34,6 +35,7 @@ In the ouputs folder, you can find the results from each of these runs below, us
   <br>
   <em>Figure: Cumulative tips usage example.</em>
 </div>
+
 
 
 
