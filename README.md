@@ -115,11 +115,11 @@ If you prefer to run the Python source code, you can use either  a **Conda envir
 To help users get started quickly, we include two example rainfall datasets in the [`Example_Datasets`](Example_Datasets/) folder. Each includes instructions and pre-run outputs demonstrating how SEPARATE handles different rain gauge formats.
 
 
-### Recommended Citation
+## Recommended Citation
 
 Murphy & David, JOSS, 2025, submitted
 
-### License Information 
+## License Information 
 MIT License
 
 Copyright (c) 2025 Murphy Watershed Lab
@@ -142,7 +142,7 @@ LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
 OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.
 
-### Legal Disclaimer
+## Legal Disclaimer
 
 SEPARATE is an open-source software package developed by the Murphy Watershed Science Lab to assist with rainfall data processing and storm event analysis. It is distributed in the hope that it will be useful for research, education, and resource management, but **without any warranty**.
 
