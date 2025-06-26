@@ -1,9 +1,5 @@
 # SEPARATE
 
-
-
-
-
 <p align="center">
   <img src="images/header.png" alt="SEPARATE Banner" width="600"/>
 </p>
@@ -166,5 +162,12 @@ SOFTWARE.
 SEPARATE is an open-source software package developed by the Murphy Watershed Science Lab to assist with rainfall data processing and storm event analysis. It is distributed in the hope that it will be useful for research, education, and resource management, but **without any warranty**.
 
 The developers make no claims regarding the accuracy, completeness, or performance of the software. Users are solely responsible for any results generated and should independently validate outputs before applying them to engineering, policy, or hazard assessment decisions.
+
+### Contributing
+We welcome suggestions, improvements, and feedback to help improve SEPARATE.
+
+If you are considering a significant code contribution, we encourage you to contact the developers first. This helps avoid duplicate efforts and ensures alignment with the project’s goals.
+
+For smaller contributions or bug reports, feel free to create an issue or fork the repository and submit a pull request. All contributions are welcome.
 
 
