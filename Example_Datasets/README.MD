@@ -19,7 +19,6 @@ Each file contains two columns:
 
 Both files are preformatted to match SEPARATE’s input requirements. You can use them to test the interface, explore SEPARATE’s options, or verify that your installation is working correctly.
 
-In the ouputs folder, you can find the results from each of these runs below, using a 15-min. storm intensity for plotting. 
 The [`Outputs`](./Outputs) folder contains the results from running both datasets with a 15-minute storm intensity threshold for plotting.
 
 <div align="center">
