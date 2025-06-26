@@ -84,12 +84,17 @@ If you prefer to run the Python source code, you can use either  a **Conda envir
     pip install -r envs/requirements.txt
     ```
 
-5.  **Install PySimpleGUI v4.60.5 manually**  
-   This version is no longer hosted on PyPI, so you’ll need to install it from the wheel file provided in the `build_installer\PySimpleGUI-4.60.5-main.zip` folder:
+5. **Install PySimpleGUI v4.60.5 manually**  
+   This version is no longer hosted on PyPI, so you’ll need to install it from the wheel file included in the repository.
 
-    ```bash
-    pip install external_packages/PySimpleGUI-4.60.5-py3-none-any.whl
-    ```
+   **Steps:**
+   1. Unzip the archive `build_installer/PySimpleGUI-4.60.5-main.zip`
+   2. Navigate to the unzipped folder (it should contain a `.whl` file)
+   3. From that folder, run:
+
+   ```bash
+   pip install PySimpleGUI-4.60.5-py3-none-any.whl
+   ```
 
     > Note: You can also install from a direct GitHub clone or file path if preferred.
 
