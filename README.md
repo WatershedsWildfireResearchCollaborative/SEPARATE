@@ -23,14 +23,23 @@ SEPARATE can be used in two ways:
 
 ### Option 1: Precompiled Installer (Recommended)
 
-A precompiled Windows installer is available [here](https://usu.box.com/v/SEPARATE-download). This version includes all required dependencies and does **not** require Python to be installed.
+Precompiled installers are available for both **Windows** and **macOS**, and include all required dependencies. No separate Python installation is needed.
 
 **Steps:**
-1. Download `SEPARATE_setup.exe` from https://usu.box.com/v/SEPARATE-download.
-2. Run the installer and follow the prompts.
-3. Launch SEPARATE from the desktop shortcut or Start Menu.
 
-> ⚠️ Note: Currently SEPARATE is only available precompiled for Windows. We plan to build an installer for MAC soon. 
+1. Download the appropriate installer for your operating system [here](https://usu.box.com/v/SEPARATE-download):
+   - `SEPARATE_Windows.exe` for **Windows**  
+   - `SEPARATE_macOS.dmg` for **macOS**
+
+2. Run the installer:
+   - On **Windows**, double-click `SEPARATE_Windows.exe` and follow the prompts.
+   - On **macOS**, open the `SEPARATE_macOS.dmg` file, then **drag `SEPARATE_GUI.app` into your Applications folder** when prompted.
+
+3. Launch SEPARATE to begin.
+
+> ⚠️ **macOS note:** The application is not code-signed. You may need to bypass Gatekeeper the first time you run it (e.g., right-click → Open).  
+> ⚠️ **Windows note:** Some antivirus software (including Windows Defender) may warn about unsigned installers. If you downloaded SEPARATE from our official link, you can safely ignore the warning and proceed with installation.
+
 
 ---
 
