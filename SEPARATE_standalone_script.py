@@ -37,16 +37,31 @@ Dependencies:
     pandas, numpy, matplotlib, scipy
 
 Citation:
-    Murphy & David (2024), [add journal name and DOI when available]
+    Murphy & David (2024), [submitted to JOSS]
 """
 
 
 # %% import required packages
 import numpy as np
 from datetime import datetime
-from functions.build_SEPARATE_layout import build_SEPARATE_layout
-import functions.SEPARATE_utilities as su
-import functions.SEPARATE_FUNCTIONS as sf
+# from functions.build_SEPARATE_layout import build_SEPARATE_layout
+try:
+    # Try import if installed via pip (PyPI)
+    from separate.functions import SEPARATE_FUNCTIONS as sf
+    from separate.functions import SEPARATE_utilities as su
+except ImportError:
+    try:
+        # Fallback if running from a cloned repo
+        import functions.SEPARATE_FUNCTIONS as sf
+        import functions.SEPARATE_utilities as su
+        print("Using local module imports (from cloned repo).")
+    except ImportError:
+        raise ImportError(
+            "Could not import SEPARATE modules.\n"
+            "Make sure you have installed the package using pip (`pip install separate`) "
+            "or are running this script from the cloned repository with the correct folder structure."
+        )
+
 import pandas as pd
 import os
 
