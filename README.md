@@ -17,7 +17,7 @@ The software is distributed both as:
 
 ## Download & Installation
 
-SEPARATE can be used in two ways:
+SEPARATE can be used in three ways:
 
 ---
 
@@ -103,7 +103,33 @@ If you prefer to run the Python source code, you can use either  a **Conda envir
     ```bash
     python SEPARATE_GUI.py
     ```
+---
+### Option 3: Install from PyPI (For Developers & Scripting Use)
 
+If you want to use SEPARATE’s core Python functions in your own scripts or Jupyter notebooks (without the GUI), you can install the backend functions directly from PyPI:
+
+```
+pip install separate
+```
+
+> This version does **not** include the GUI . It is intended for developers or users who want to integrate SEPARATE into custom workflows or batch-processing.
+
+**Example Usage:**
+
+```python
+from separate.functions import SEPARATE_FUNCTIONS as sf
+from separate.functions import SEPARATE_utilities as su
+```
+
+For an example script demonstrating function usage, see:  
+[`SEPARATE_standalone_script.py`](https://github.com/WatershedsWildfireResearchCollaborative/SEPARATE/blob/main/SEPARATE_standalone_script.py)
+
+
+Notes
+>- If you're unsure which version to use, we recommend starting with the **precompiled installer**.
+>- Developers contributing to the backend should use either the **source code** or **PyPI version**, depending on your workflow.
+
+---
 ## Documentation
 
 - [User Manual (PDF)](SEPARATE-User-Manual-Version1.0.pdf)
