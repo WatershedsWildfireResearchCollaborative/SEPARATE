@@ -17,7 +17,7 @@ Each file contains two columns:
    - Cumulative tip count (`Cumulative Tips` format), or
    - Rainfall per interval (`Fixed Interval` format)
 
-Both files are preformatted to match SEPARATE’s input requirements. You can use them to test the interface, explore SEPARATE’s options, or verify that your installation is working correctly. For more information about rain gauge data types, GUI parameter selection, and underlying data processing methods, see the Supplement [hyperlink to pdf] or our detailed [Instruction Manual] [../SEPARATE-User-Manual-Version1.0.pdf]
+Both files are preformatted to match SEPARATE’s input requirements. You can use them to test the interface, explore SEPARATE’s options, or verify that your installation is working correctly. For more information about rain gauge data types, GUI parameter selection, and underlying data processing methods, see the [Supplement][..supplementary/Supplementary_Information.pdf] or our detailed [Instruction Manual][../SEPARATE-User-Manual-Version1.0.pdf]
 
 The [`ExampleOutputs`](./ExampleOutputs) folder contains results from running both datasets (named accordingly) using a 15-minute duration storm intensity for plotting.
 
