@@ -174,7 +174,7 @@ SEPARATE is an open-source software package developed by the Murphy Watershed Sc
 
 The developers make no claims regarding the accuracy, completeness, or performance of the software. Users are solely responsible for any results generated and should independently validate outputs before applying them to engineering, policy, or hazard assessment decisions.
 
-### Contributing
+### Contributions & Feedback
 We welcome suggestions, improvements, and feedback to help improve SEPARATE.
 
 If you are considering a significant code contribution, we encourage you to contact the developers first. This helps avoid duplicate efforts and ensures alignment with the project’s goals.
