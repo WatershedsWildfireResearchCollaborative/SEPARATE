@@ -10,7 +10,7 @@
 SEPARATE is an open-source, GUI-based software package that provides users with a fast, reliable, and automated method to post-process tipping bucket rain gauge (TBRG) data. It enables the identification and partitioning of independent storm events and calculates key rainfall metrics like storm duration, magnitude, and intensity. SEPARATE supports both user-defined and statistical (independent storm criterion) approaches to event separation, while offering a range of tabular and graphical output options.
 
 The software is distributed both as:
-- A **standalone executable** (no Python installation needed)
+- A **standalone desktop application** (no Python installation needed)
 - A **source code version** with environment files for Python users
 
  SEPARATE was developed using PySimpleGUI, compiled into a standalone executable with PyInstaller, and packaged using Inno Setup for distribution.
@@ -148,7 +148,7 @@ Murphy & David, JOSS, 2025, submitted
 ## License Information 
 MIT License
 
-Copyright (c) 2025 Murphy Watershed Lab
+Copyright (c) 2025 Brendan P. Murphy & Scott R. David
 
 Permission is hereby granted, free of charge, to any person obtaining a copy
 of this software and associated documentation files (the "Software"), to deal
