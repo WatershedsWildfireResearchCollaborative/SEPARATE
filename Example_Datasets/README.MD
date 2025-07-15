@@ -8,8 +8,8 @@
 To help users get started quickly, we include two example datasets:
 | Filename                             | Description                                                                 |
 |--------------------------------------|-----------------------------------------------------------------------------|
-| `FixedInterval_TBRG_Example.xlsx`    | Example dataset logged at regular intervals using fixed time steps.      |
-| `CumulativeTips_TBRG_Example.xlsx`   | Example dataset with cumulative tip logging style (e.g., HOBO loggers).  |
+| `ExampleData_FixedInterval.xlsx`    | Example dataset logged at regular intervals using fixed time steps.      |
+| `ExampleData_CumulativeTips.xlsx`   | Example dataset with cumulative tip logging style (e.g., HOBO loggers).  |
 
 Each file contains two columns:
 1. **Timestamp** in the format `MM/DD/YY HH:MM:SS`
@@ -19,7 +19,7 @@ Each file contains two columns:
 
 Both files are preformatted to match SEPARATE’s input requirements. You can use them to test the interface, explore SEPARATE’s options, or verify that your installation is working correctly.
 
-The [`Outputs`](./Outputs) folder contains the results from running both datasets with a 15-minute storm intensity threshold for plotting.
+The [`ExampleOutputs`](./ExampleOutputs) folder contains results from running both datasets (named accordingly) using a 15-minute duration storm intensity for plotting.
 
 <div align="center">
   <img src="../images/fixed_example.png" alt="Fixed Interval Input Example" width="500"/>
