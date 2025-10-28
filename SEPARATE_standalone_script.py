@@ -33,7 +33,7 @@ Repository:
     https://github.com/WatershedsWildfireResearchCollaborative/SEPARATE
 
 Dependencies:
-    Python ≥ 3.10
+    Python >= 3.10, < 3.13
     pandas, numpy, matplotlib, scipy
 
 Citation:
