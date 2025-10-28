@@ -22,7 +22,7 @@ Citation:
     Murphy & David (2024), [Journal/DOI if known or placeholder]
 
 Dependencies:
-    Python ≥ 3.10
+    Python >= 3.10, < 3.13
     PySimpleGUI == 4.60.5
     pandas, numpy, matplotlib, scipy, openpyxl
 """
