@@ -66,17 +66,25 @@ If you prefer to run the Python source code, you can use either  a **Conda envir
     ```
 
 #### Option 2B: Using pip + venv
+> ⚠️ **Python 3.12 recommended (3.10 - 3.12 supported)**  
+> Python 3.13 is **not yet supported** due to dependency incompatibilities.
 
 1. Clone or download the repository.
 
 2. Open **Command Prompt** or **PowerShell** and navigate to the project folder.
 
 3. Create and activate a virtual environment:
+   - **Windows**
+     ```bash
+     py -3.12 -m venv separate_env
+     .\separate_env\Scripts\activate
+     ```
 
-    ```bash
-    python -m venv separate_env
-    .\separate_env\Scripts\activate
-    ```
+   - **macOS / Linux**
+     ```bash
+     python3.12 -m venv separate_env
+     source separate_env/bin/activate
+     ```
 
 4. Install required packages:
 
@@ -85,8 +93,9 @@ If you prefer to run the Python source code, you can use either  a **Conda envir
     ```
 
 5. **Install PySimpleGUI v4.60.5 manually**  
-   This version is no longer hosted on PyPI, so you’ll need to install it from the wheel file included in the repository.
+   This version is no longer hosted on PyPI, so you'll need to install it from the wheel file included in the repository.
 
+    
    **Steps:**
    1. Unzip the archive `build_installer/PySimpleGUI-4.60.5-main.zip`
    2. Navigate to the unzipped folder (it should contain a `.whl` file)
@@ -105,8 +114,10 @@ If you prefer to run the Python source code, you can use either  a **Conda envir
     ```
 ---
 ### Option 3: Install from PyPI (For Developers & Scripting Use)
+> ⚠️ **Python 3.12 recommended (3.10 - 3.12 supported)**  
+> Python 3.13 is **not yet supported** due to dependency incompatibilities.
 
-If you want to use SEPARATE’s core Python functions in your own scripts or Jupyter notebooks (without the GUI), you can install the backend functions directly from PyPI:
+If you want to use SEPARATE's core Python functions in your own scripts or Jupyter notebooks (without the GUI), you can install the backend functions directly from PyPI:
 
 ```
 pip install separate
