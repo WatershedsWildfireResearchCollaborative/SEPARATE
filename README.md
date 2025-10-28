@@ -45,7 +45,7 @@ Precompiled installers are available for both **Windows** and **macOS**, and inc
 
 ###  Option 2: Run from Source Code
 
-If you prefer to run the Python source code, you can use either  a **Conda environment** or a **virtualenv with pip**..
+If you prefer to run the Python source code, you can use either a **Conda environment** or a **virtualenv with pip**.
 
 #### Option 2A: Using Conda 
 
@@ -55,6 +55,7 @@ If you prefer to run the Python source code, you can use either  a **Conda envir
     ```bash
     conda env create -f envs/SEPARATE.yml
     ```
+> Note: The provided environment file automatically installs Python 3.12 and all dependencies.
 
 4. Activate the environment or add the environment to you preferred IDE
     ```bash
@@ -66,6 +67,7 @@ If you prefer to run the Python source code, you can use either  a **Conda envir
     ```
 
 #### Option 2B: Using pip + venv
+
 > ⚠️ **Python 3.12 recommended (3.10 - 3.12 supported)**  
 > Python 3.13 is **not yet supported** due to dependency incompatibilities.
 
