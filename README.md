@@ -56,7 +56,7 @@ If you prefer to run the Python source code, you can use either  a **Conda envir
     conda env create -f envs/SEPARATE.yml
     ```
 
-4. Activate the environment or add the evironment to you prefered IDE
+4. Activate the environment or add the environment to you preferred IDE
     ```bash
     conda activate SEPARATE
     ```
