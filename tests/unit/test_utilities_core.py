@@ -11,9 +11,7 @@ import pandas as pd
     (None, False),
     ("abc", False),
     ("NaN", True),
-    (np.NaN, True)
-])
-
+    (np.NaN, True)])
 def test_is_numeric(val, expected):
     assert su.is_numeric(val) == expected
 
@@ -59,24 +57,8 @@ def test_check_numerical_values():
 
 
 # ---------- check_for_required_fields ----------
-@pytest.fixture
-def base_args():
-    """Minimal working GUI-style input dictionary."""
-    return {
-        "Storm_Gap_Type": "User-Defined MIT (UDM)",
-        "plot_opt": False,
-        "plot_int": 60,
-        "sheet_name": "",
-        "plt_end_date": "",
-        "plt_start_date": "",
-        "min_depth_bool": False,
-        "min_duration_bool": True,
-        "min_depth": 0.2,
-        "min_duration": 0.5,
-        "fixed_mit": 2.0,
-        "isc_interval": 24,
-    }
 
+# base_args is defined in the conftest file
 # test UDM
 def test_udm_required_flds(base_args):
     a = base_args.copy()
@@ -109,21 +91,8 @@ def test_ttc_required_flds(base_args):
 
 
 # ---------- check_input_type ----------
-def test_check_input_type(base_args):
-    dtype = {
-        "Storm_Gap_Type": "str",
-        "plot_opt": "bool",
-        "plot_int": "int",
-        "sheet_name": "str",
-        "plt_end_date": "str",
-        "plt_start_date": "str",
-        "min_depth_bool": "bool",
-        "min_duration_bool": "bool",
-        "min_depth": "float",
-        "min_duration": "float",
-        "fixed_mit": "float",
-        "isc_interval": "int",
-    }
+def test_check_input_type(base_args, base_types):
+    dtype = base_types.copy()
     # test all pass
     required = list(base_args.keys())
     ok, msg = su.check_input_type(base_args, required, dtype)
