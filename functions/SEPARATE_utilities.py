@@ -16,9 +16,10 @@ def is_numeric(value):
         # Attempt to convert the value to a float
         float(value)
         return True
-    except ValueError:
+    except (ValueError, TypeError):
         # If the conversion fails, the value is not numeric
         return False
+
 
 def convert_strings_to_floats(input_dict):
     """
@@ -32,7 +33,7 @@ def convert_strings_to_floats(input_dict):
         input_dict (dict): The input dictionary to be converted.
 
     Returns:
-        None. The input dictionary is modified in-place.
+        (dict). The updated dictionary with numeric strings converted to floats.
     """
     for key, value in input_dict.items():
         if isinstance(value, str):
@@ -93,10 +94,10 @@ def is_gui_filled(values, required_fields):
     missing_fields = []
     field_bool = True
     for field in required_fields:
-        if values[field] == '' or values[field] is None:
+        val = values.get(field, None)
+        if val in ("", None):
             missing_fields.append(field)
-            field_bool = False
-    return field_bool, missing_fields
+    return len(missing_fields) == 0, missing_fields
 
 
 def check_numerical_values(values_to_check):
@@ -183,6 +184,7 @@ def check_for_required_fields(args):
     required_fields = [x for x in all_fields if x not in remove_fields]
     return required_fields
 
+
 def check_input_type(input_args, required_fields, dtype_args):
     """
     Check that all required fields are the correct data type.
@@ -235,6 +237,7 @@ def check_input_type(input_args, required_fields, dtype_args):
         error_message = None
 
     return tf_type, error_message
+
 
 def validate_tip_type_from_raw_file(filename, sheetname, tip_type):
     """

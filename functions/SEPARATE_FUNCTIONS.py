@@ -587,6 +587,7 @@ def plot_inter_event_histogram(filtered_interevent_times, mean_tb, Fixed_MIT, ga
     plt.savefig(os.path.join(gap_plots_path, filename))
     plt.close()
 
+
 def separate_peak_intensity(start_time_abs, t_fit, R_fit, intensity_interval):
     """
     Calculate the peak intensity (iD_Mag) and corresponding time for a given storm profile.
