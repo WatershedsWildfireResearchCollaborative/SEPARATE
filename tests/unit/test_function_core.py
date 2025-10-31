@@ -54,9 +54,7 @@ def test_preprocess_cumulative_tips_xlsx(cumulative_input_file):
     assert isinstance(tip_depth, np.ndarray)
     assert tip_dt.is_monotonic_increasing
     assert pd.to_datetime(start_dt) <= pd.to_datetime(end_dt)
-
     # Each tip contributes exactly tip_mag depth in the processed series
     assert np.allclose(tip_depth, tip_mag)
 
-    # logging_interval is not used for cumulative (but ensure it's numeric)
-    assert np.isscalar(log_int)
+

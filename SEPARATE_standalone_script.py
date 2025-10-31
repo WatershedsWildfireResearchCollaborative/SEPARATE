@@ -178,8 +178,6 @@ valid_tip, inferred_tip, raw_datetime = su.validate_tip_type_from_raw_file(filen
 if not valid_tip:
     print(f"Tip type mismatch.\nYou selected '{tip_type}', but SEPARATE inferred '{inferred_tip}'")
 
-# update progress bar
-
 
 # get minimum time between storms in hours
 if storm_gap_type == 'ISC':
