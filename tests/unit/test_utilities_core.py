@@ -106,37 +106,19 @@ def test_check_input_type(base_args, base_types):
     ok, msg = su.check_input_type(base_args, required, dtype)
     assert ok is False
 
+# ---------- validate_tip_type ----------
 
-def test_validate_tip_type_fixed_interval(tmp_path):
-    # Create synthetic datetime data with constant spacing
-    times = pd.date_range("2025-01-01", periods=10, freq="10min")
-    df = pd.DataFrame({"datetime": times, "value": np.arange(10)})
-
-    # Write to a temporary CSV
-    csv_file = tmp_path / "test_fixed.csv"
-    df.to_csv(csv_file, index=False)
-
-    # Run the function
-    valid, inferred, series = su.validate_tip_type_from_raw_file(str(csv_file), "", "Fixed Interval")
-
-    # Assertions
+def test_validate_tip_type_fixed_interval(fixed_input_file):
+    path, sheet, tip_type, tip_size = fixed_input_file
+    valid, inferred, series = su.validate_tip_type_from_raw_file(path, sheet if sheet else "", tip_type)
     assert inferred == "Fixed Interval"
     assert valid is True
     assert isinstance(series, pd.Series)
 
-def test_validate_tip_type_cumulative(tmp_path):
-    times = pd.to_datetime([
-        "2025-01-01 00:00:00",
-        "2025-01-01 00:15:00",
-        "2025-01-01 00:33:00",
-        "2025-01-01 01:02:00",
-        "2025-01-01 01:50:00",
-    ])
-    df = pd.DataFrame({"datetime": times, "value": np.arange(len(times))})
-    fp = tmp_path / "test_cum.csv"
-    df.to_csv(fp, index=False)
-
-    valid, inferred, series = su.validate_tip_type_from_raw_file(str(fp), "", "Fixed Interval")
-
+def test_validate_tip_type_cumulative(cumulative_input_file):
+    path, sheet, tip_type, tip_size = cumulative_input_file
+    valid, inferred, series = su.validate_tip_type_from_raw_file(path, sheet if sheet else "", tip_type)
     assert inferred == "Cumulative Tips"
-    assert valid is False
+    assert valid is True
+    assert isinstance(series, pd.Series)
+

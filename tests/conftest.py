@@ -59,6 +59,25 @@ def tmp_outdir(tmp_path):
 
 
 
+# # Create synthetic datetime data with constant spacing
+# times = pd.date_range("2025-01-01", periods=10, freq="10min")
+# df = pd.DataFrame({"datetime": times, "value": np.arange(10)})
+#
+# # Write to a temporary CSV
+# csv_file = tmp_path / "test_fixed.csv"
+# df.to_csv(csv_file, index=False)
+
+# times = pd.to_datetime([
+#     "2025-01-01 00:00:00",
+#     "2025-01-01 00:15:00",
+#     "2025-01-01 00:33:00",
+#     "2025-01-01 01:02:00",
+#     "2025-01-01 01:50:00",
+# ])
+# df = pd.DataFrame({"datetime": times, "value": np.arange(len(times))})
+# fp = tmp_path / "test_cum.csv"
+# df.to_csv(fp, index=False)
+
 # swap this real data out with the synthetic data in the near future
 @pytest.fixture(scope="session")
 def fixed_input_file():
