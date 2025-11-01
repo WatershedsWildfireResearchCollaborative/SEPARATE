@@ -188,9 +188,10 @@ def separate_ISC(tip_datetime, tip_depth, isc_t_max, min_depth, min_duration,
 
         N_storms = N_nofilter - N_suppressed
         StormNumsRec.append([N_storms, N_suppressed])
-
         mean_IET[i] = np.nanmean(ISC_interevent_times)
         std_IET[i] = np.nanstd(ISC_interevent_times, ddof=1)
+        # mean_IET[i] = np.nanmean(ISC_interevent_times - trial_interval)
+        # std_IET[i] = np.nanstd(ISC_interevent_times - trial_interval, ddof=1)
         CV_IET[i] = std_IET[i] / mean_IET[i] if mean_IET[i] != 0 else np.nan
 
         # # Compute IET statistics (in hours)

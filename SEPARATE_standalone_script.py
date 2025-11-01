@@ -207,7 +207,7 @@ if storm_gap_type == 'ISC':
 
 
     # compute storm gap using optimized method
-    Fixed_MIT, CV_IET, mean_IET, std_IET, ISC_testintervals, StormNumsRec= sf.separate_ISC(tip_datetime, tip_depth, isc_t_max, min_depth, min_duration,
+    Fixed_MIT, mean_tb, CV_IET, mean_IET, std_IET, ISC_testintervals, StormNumsRec= sf.separate_ISC(tip_datetime, tip_depth, isc_t_max, min_depth, min_duration,
                            gap_plots_path, output_name, plt_ext)
 
 elif storm_gap_type == 'RTTC':

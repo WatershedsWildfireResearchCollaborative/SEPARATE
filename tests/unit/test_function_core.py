@@ -57,4 +57,5 @@ def test_preprocess_cumulative_tips_xlsx(cumulative_input_file):
     # Each tip contributes exactly tip_mag depth in the processed series
     assert np.allclose(tip_depth, tip_mag)
 
+# compute MIT
 
