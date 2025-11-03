@@ -122,3 +122,14 @@ def test_validate_tip_type_cumulative(cumulative_input_file):
     assert valid is True
     assert isinstance(series, pd.Series)
 
+# @pytest.mark.parametrize("fixture_name, expected", [
+#     ("fixed_input_file", "Fixed Interval"),
+#     ("cumulative_input_file", "Cumulative Tips"),
+# ])
+# def test_tip_type_inference_smoke(request, fixture_name, expected):
+#     path, sheet, tip_type, tip_size = request.getfixturevalue(fixture_name)
+#     valid, inferred, series = su.validate_tip_type_from_raw_file(path, sheet or "", tip_type)
+#     assert inferred == expected
+#     assert valid is True
+#     assert isinstance(series, pd.Series)
+#     assert series.is_monotonic_increasing

@@ -40,6 +40,9 @@ def test_preprocess_fixed_interval_xlsx(fixed_input_file):
 
     # Zero-depth rows should have been removed before returning
     assert (tip_depth > 0).any()
+    fixed_tip_dt = tip_dt
+    fixed_tip_depth = tip_depth
+    return fixed_tip_dt, fixed_tip_depth
 
 # cumulative tips
 def test_preprocess_cumulative_tips_xlsx(cumulative_input_file):
@@ -56,6 +59,10 @@ def test_preprocess_cumulative_tips_xlsx(cumulative_input_file):
     assert pd.to_datetime(start_dt) <= pd.to_datetime(end_dt)
     # Each tip contributes exactly tip_mag depth in the processed series
     assert np.allclose(tip_depth, tip_mag)
+    return tip_dt, tip_depth
 
 # compute MIT
-
+def test_separate_isc_fixed_data(fixed_input_file):
+    Fixed_MIT, mean_tb, CV_IET, mean_IET, std_IET, ISC_testintervals, StormNumsRec = sf.separate_ISC(
+        tip_datetime, tip_depth, isc_t_max, min_depth, min_duration,
+        gap_plots_path, output_name, plt_ext)
