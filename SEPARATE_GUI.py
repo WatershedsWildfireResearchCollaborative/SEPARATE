@@ -431,7 +431,7 @@ def main():
                                                 f'Peak Intensity Date and Time:': f'{peak_dt_str}',
                                                 f'Number of Tips': f'{len(tip_idx)}'}
 
-                                storm_profiles[dataset_name] = {f'Cumulative Storm Time (hours)': np.round(iD_time/60,2),
+                                storm_profiles[dataset_name] = {f'Cumulative Storm Time (hours)': np.round(iD_time/60,4),
                                                                 # interpolated time range since start of storm
                                                                 f'{plot_int}-min Intensity ({tip_units}/hr)': np.round(iD_Mag,2),
                                                                 f'Storm Metadata': storm_meta_data}
