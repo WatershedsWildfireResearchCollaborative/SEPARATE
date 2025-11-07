@@ -649,7 +649,7 @@ def separate_peak_intensity(start_time_abs, t_fit, R_fit, intensity_interval):
 
 
 def output_fitting_parameters_to_file(software_metadata, user_parameters, gap_CV, gap_mean,gap_std, stormgap_array,
-                                      StormNumsRec,  output_name, gap_plots_path):
+                                      StormNumsRec,  output_name, gap_plots_path, output_ext):
     """
     Outputs the fitting parameters from the independence criterion method to an Excel file.
 
@@ -690,30 +690,49 @@ def output_fitting_parameters_to_file(software_metadata, user_parameters, gap_CV
     # output = pd.DataFrame(values_df, columns=columns)
     output_headers = pd.DataFrame([units], columns=columns)
 
+    # get file extension
+    output_ext = output_ext.lower()
+    if output_ext not in (".xlsx", ".csv"):
+        output_ext = ".xlsx" # fail-safe into xlsx
     # output file name
-    output_file_name = f"{output_name}_ISC_analysis.xlsx"  # create a file name
-    output_table_fid = os.path.join(gap_plots_path, output_file_name)  # set up full file path
+    output_file_name = f"{output_name}_ISC_analysis{output_ext}"  # create a file name
+    out_fid  = os.path.join(gap_plots_path, output_file_name)  # set up full file path
 
-    sheetname = 'Independent_Storms_Criterion'
-    with pd.ExcelWriter(output_table_fid, engine='openpyxl') as writer:
-        # write citations and version info to excel
-        software_metadata_df.to_excel(writer, sheet_name=sheetname, index=False, startrow=0, header=False)
+    if output_ext == ".xlsx": # write xlsx
+        with pd.ExcelWriter(out_fid, engine='openpyxl') as writer:
+            sheetname = 'Independent_Storms_Criterion'
+            # write citations and version info to excel
+            software_metadata_df.to_excel(writer, sheet_name=sheetname, index=False, startrow=0, header=False)
 
-        # write user inputs to excel
-        s_row = len(software_metadata) + 1
-        user_parameters_df.to_excel(writer, sheet_name=sheetname, index=False, startrow=s_row, header=False)
-        # s_row = s_row + len(user_parameters) + 1
-        # best_fit_df.to_excel(writer, sheet_name=sheetname, index=False, header=False, startrow=s_row)
+            # write user inputs to excel
+            s_row = len(software_metadata) + 1
+            user_parameters_df.to_excel(writer, sheet_name=sheetname, index=False, startrow=s_row, header=False)
+            # s_row = s_row + len(user_parameters) + 1
+            # best_fit_df.to_excel(writer, sheet_name=sheetname, index=False, header=False, startrow=s_row)
 
-        # Write the output DataFrame below the metadata
-        # s_row = s_row + len(best_fit_df) + 1
-        s_row = s_row + len(user_parameters) + 1
-        output_headers.to_excel(writer, sheet_name=sheetname, index=False, startrow=s_row)
+            # Write the output DataFrame below the metadata
+            # s_row = s_row + len(best_fit_df) + 1
+            s_row = s_row + len(user_parameters) + 1
+            output_headers.to_excel(writer, sheet_name=sheetname, index=False, startrow=s_row)
 
-        # Write the output DataFrame below the metadata
-        s_row = s_row + 2
-        values_df.to_excel(writer, sheet_name=sheetname, index=False, startrow=s_row, header=False)
-        # output.to_excel(writer, sheet_name=sheetname, index=False, startrow=s_row)
+            # Write the output DataFrame below the metadata
+            s_row = s_row + 2
+            values_df.to_excel(writer, sheet_name=sheetname, index=False, startrow=s_row, header=False)
+            # output.to_excel(writer, sheet_name=sheetname, index=False, startrow=s_row)
+    else:
+        with open(out_fid, "w", newline="") as f:
+            # metadata (one col)
+            software_metadata_df.to_csv(f, index=False, header=False)
+            # blank line
+            f.write("\n")
+            # user parameters (two cols)
+            user_parameters_df.to_csv(f, index=False, header=False)
+            # blank line
+            f.write("\n")
+            # header row (units)
+            output_headers.to_csv(f, index=False, header=True)
+            # data
+            values_df.to_csv(f, index=False, header=False)
 
 
 def separate_profile_plots(interval, tip_units, Peak_int, Peak_time, t_fit, R_fit, tip_idx, iD_time, iD_Mag,

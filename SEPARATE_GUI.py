@@ -527,7 +527,7 @@ def main():
                         # output the fitting parameters
                         sf.output_fitting_parameters_to_file(software_metadata, header_parameters, CV_IET, mean_IET,
                                                             std_IET,ISC_testintervals, StormNumsRec,
-                                                            output_name, gap_plots_path)
+                                                            output_name, gap_plots_path, input_ext)
 
                     # build output dataframe
                     output = pd.DataFrame(storm_record)
