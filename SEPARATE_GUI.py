@@ -270,6 +270,10 @@ def main():
 
             #  ................................Execute SEPARATE algorithm...........................................
             if tf_type and tf_fields and tf_date:
+                # check input file type
+                _, input_ext = os.path.splitext(filename)
+                input_ext = input_ext.lower()
+
                 try:
                     errmsg = None
 
@@ -431,15 +435,17 @@ def main():
                                                 f'Peak Intensity Date and Time:': f'{peak_dt_str}',
                                                 f'Number of Tips': f'{len(tip_idx)}'}
 
-                                storm_profiles[dataset_name] = {f'Cumulative Storm Time (hours)': np.round(iD_time/60,4),
+                                storm_profiles[dataset_name] = {f'Cumulative Storm Time (hours)': np.array([round(x, 4) for x in iD_time / 60]),
+                                                                # f'Cumulative Storm Time (hours)': np.round(iD_time / 60,4),
                                                                 # interpolated time range since start of storm
                                                                 f'{plot_int}-min Intensity ({tip_units}/hr)': np.round(iD_Mag,2),
                                                                 f'Storm Metadata': storm_meta_data}
                                 # # return the raw data
                                 storm_raw_profiles[dataset_name] = {f'TBRG Time Stamp': tip_datetime[tip_idx],  # win_range,
-                                                                    f'Cumulative Storm Time (hours)': np.round(
-                                                                        cumulative_time_hours, 2),  # win_range,
-                                                                    f'Cumulative Rainfall ({tip_units})': cum_rain}
+                                                                    f'Cumulative Storm Time (hours)':
+                                                                        np.round(cumulative_time_hours, 2),  # win_range,
+                                                                    f'Cumulative Rainfall ({tip_units})':
+                                                                        np.round(cum_rain,2)}
 
                             # optionally plot the storm profile and peak intensity
                             if plot_opt and plot_int == interval and ~np.isnan(peakiDs[1]):
@@ -564,7 +570,7 @@ def main():
                     errmsg = sf.separate_outputs(output, storm_profiles, storm_raw_profiles, tip_units,
                                                 I_intervals, data_opt, header_parameters, output_path,
                                                 output_name, plot_int, plt_ext, plot_start_date, plot_end_date,
-                                                software_metadata, columns, units)
+                                                software_metadata, columns, units, input_ext)
 
                     # update progress bar
                     print('complete')

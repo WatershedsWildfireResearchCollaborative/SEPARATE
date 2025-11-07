@@ -779,7 +779,7 @@ def separate_profile_plots(interval, tip_units, Peak_int, Peak_time, t_fit, R_fi
 
 def separate_outputs(output, storm_profiles, storm_raw_profiles, tip_units, I_intervals, data_opt,
                      header_parameters, output_path, output_name, plot_int, plt_ext, plot_start_date, plot_end_date,
-                     software_metadata, columns, units):
+                     software_metadata, columns, units, output_ext):
     """
     Create final output spreadsheets and summary plots.
 
@@ -817,58 +817,160 @@ def separate_outputs(output, storm_profiles, storm_raw_profiles, tip_units, I_in
     user_parameters_df = pd.DataFrame(list(header_parameters.items()), columns=['User Parameters', 'Parameter'])
 
     errmsg = None
-    # Set up output file path for the summary Excel file.
-    output_file_name = f"{output_name}_SummaryTable.xlsx"
-    output_table_fid = os.path.join(output_path, output_file_name)
-    sheetname = 'Storms_Summary'
+    is_csv = output_ext.lower() == ".csv"
+    # stack all the data
+    all_profiles_rows = []
+
+    if data_opt:
+        for storm_name, profile_data in storm_profiles.items():
+            # left block (profile)
+            left = pd.DataFrame({
+                "Storm ID": storm_name,
+                "Cumulative Storm Time (hours)": profile_data.get("Cumulative Storm Time (hours)", []),
+                "Intensity Profile (mm/hr)": profile_data.get(
+                    f"{plot_int}-min Intensity ({tip_units}/hr)", []
+                ),
+            })
+
+            # right block (raw)
+            raw_profile = storm_raw_profiles.get(storm_name)
+            if raw_profile is not None:
+                right = pd.DataFrame({
+                    "Storm ID": storm_name,
+                    "TBRG Time Stamp": raw_profile.get("TBRG Time Stamp", []),
+                    "Cumulative Storm Time (hours) (raw)": raw_profile.get("Cumulative Storm Time (hours)", []),
+                    f"Cumulative Rainfall ({tip_units})": raw_profile.get(
+                        f"Cumulative Rainfall ({tip_units})", []
+                    ),
+                })
+            else:
+                right = pd.DataFrame()
+
+            #  pad the shorter one to the length of the longer one
+            max_len = max(len(left), len(right))
+            left = left.reindex(range(max_len))
+            right = right.reindex(range(max_len))
+
+            # build two empty columns between the datasets
+            blanks = pd.DataFrame({
+                "": [np.nan] * max_len,
+                " ": [np.nan] * max_len
+            })
+
+            combined = pd.concat([left, blanks, right], axis=1)
+            all_profiles_rows.append(combined)
+
+    # final stacked table
+    all_profiles_df = (
+        pd.concat(all_profiles_rows, ignore_index=True)
+        if all_profiles_rows else pd.DataFrame()
+    )
 
     try:
-        with pd.ExcelWriter(output_table_fid, engine='openpyxl') as writer:
-            # Write software metadata at the top.
-            software_metadata_df.to_excel(writer, sheet_name=sheetname, index=False, startrow=0, header=False)
+        if is_csv:
+            # ---------------- CSV OUTPUT ----------------
+            summary_fid = os.path.join(output_path, f"{output_name}_SummaryTable.csv")
+            # Write summary file
+            with open(summary_fid, "w", newline="") as f:
+                # software metadata (one column)
+                software_metadata_df.to_csv(f, index=False, header=False)
+                # blank line
+                f.write("\n")
+                # user parameters (two columns)
+                user_parameters_df.to_csv(f, index=False, header=False)
+                # blank line
+                f.write("\n")
+                # 4. header row (units)
+                output_headers.to_csv(f, index=False, header=True)
+                # 5. actual summary table (no header, since headers just written)
+                output.to_csv(f, index=False, header=False)
 
-            # Write user parameters below metadata.
-            s_row = len(software_metadata) + 1
-            user_parameters_df.to_excel(writer, sheet_name=sheetname, index=False, startrow=s_row, header=False)
+            # Write all profiles file
+            if data_opt and not all_profiles_df.empty:
+                all_profiles_df.to_csv(
+                    os.path.join(output_path, f"{output_name}_All_Storm_Profiles.csv"),
+                    index=False
+                )
 
-            # Write the header row for the summary table.
-            s_row = s_row + len(header_parameters) + 1
-            output_headers.to_excel(writer, sheet_name=sheetname, index=False, startrow=s_row)
+            # per-storm CSVs; this will kick out a separate csv for each storm profile
+            # if data_opt:
+            #     for storm_name, profile_data in storm_profiles.items():
+            #         df_profile = pd.DataFrame({
+            #             'Cumulative Storm Time (hours)': profile_data.get('Cumulative Storm Time (hours)', []),
+            #             f'Intensity Profile ({tip_units}/hr)': profile_data.get(
+            #                 f'{plot_int}-min Intensity ({tip_units}/hr)', [])
+            #         })
+            #         df_profile.to_csv(
+            #             os.path.join(output_path, f"{output_name}_{storm_name}_profile.csv"),
+            #             index=False
+            #         )
+            #         if storm_name in storm_raw_profiles:
+            #             pd.DataFrame(storm_raw_profiles[storm_name]).to_csv(
+            #                 os.path.join(output_path, f"{output_name}_{storm_name}_raw.csv"),
+            #                 index=False
+            #             )
 
-            # Write the summary table.
-            s_row = s_row + 2
-            output.to_excel(writer, sheet_name=sheetname, index=False, startrow=s_row, header=False)
+        else:
+            # ---------------- EXCEL OUTPUT ----------------
+            output_file_name = f"{output_name}_SummaryTable.xlsx"
+            output_table_fid = os.path.join(output_path, output_file_name)
+            sheetname = "Storms_Summary"
+            with pd.ExcelWriter(output_table_fid, engine='openpyxl') as writer:
+                # metadata
+                software_metadata_df.to_excel(writer, sheet_name=sheetname,
+                                              index=False, startrow=0, header=False)
+                s_row = len(software_metadata) + 1
+                user_parameters_df.to_excel(writer, sheet_name=sheetname,
+                                            index=False, startrow=s_row, header=False)
 
-            # If data_opt is True, write storm profile data to separate sheets.
-            if data_opt:
-                for storm_name, profile_data in storm_profiles.items():
-                    # Create a DataFrame for interpolated (profile) data.
-                    # 'Cumulative Storm Time (hours)', 'Intensity Profile (mm/hr)', and 'Storm Metadata'
-                    df_profile = pd.DataFrame({
-                        'Cumulative Storm Time (hours)': profile_data.get('Cumulative Storm Time (hours)', []),
-                        f'Intensity Profile ({tip_units}/hr)': profile_data.get(
-                            f'{plot_int}-min Intensity ({tip_units}/hr)', [])
-                    })
-                    # Create header for this sheet.
-                    metadata = profile_data.get('Storm Metadata', {})
-                    df_meta = pd.DataFrame(list(metadata.items()), columns=['User Parameters', 'Parameter'])
+                # headers + summary
+                s_row = s_row + len(header_parameters) + 1
+                output_headers.to_excel(writer, sheet_name=sheetname,
+                                        index=False, startrow=s_row)
+                s_row = s_row + 2
+                output.to_excel(writer, sheet_name=sheetname,
+                                index=False, startrow=s_row, header=False)
 
-                    # Write metadata and profile data to a separate sheet named by storm_name.
-                    df_meta.to_excel(writer, sheet_name=storm_name, index=False, header=False)
-                    df_profile.to_excel(writer, sheet_name=storm_name, index=False, startrow=len(df_meta) + 1)
+                # stacked tables as extra sheets
+                if data_opt and not all_profiles_df.empty:
+                    all_profiles_df.to_excel(writer, sheet_name="All_Storm_Profiles", index=False)
 
-                    # Similarly, write raw profile data if available.
-                    if storm_name in storm_raw_profiles:
-                        raw_data = storm_raw_profiles[storm_name]
-                        df_raw = pd.DataFrame(raw_data)
-                        # Write raw data starting a few columns to the right.
-                        df_raw.to_excel(writer, sheet_name=storm_name, index=False, startrow=len(df_meta) + 1,
-                                        startcol=len(df_profile.columns) + 2)
+                    # # keep per-storm sheets
+                    # for storm_name, profile_data in storm_profiles.items():
+                    #     df_profile = pd.DataFrame({
+                    #         'Cumulative Storm Time (hours)': profile_data.get('Cumulative Storm Time (hours)', []),
+                    #         f'Intensity Profile ({tip_units}/hr)': profile_data.get(
+                    #             f'{plot_int}-min Intensity ({tip_units}/hr)', [])
+                    #     })
+                    #     metadata = profile_data.get('Storm Metadata', {})
+                    #     df_meta = pd.DataFrame(list(metadata.items()),
+                    #                            columns=['User Parameters', 'Parameter'])
+                    #
+                    #     df_meta.to_excel(writer, sheet_name=storm_name,
+                    #                      index=False, header=False)
+                    #     df_profile.to_excel(writer, sheet_name=storm_name,
+                    #                         index=False, startrow=len(df_meta) + 1)
+                    #
+                    #     if storm_name in storm_raw_profiles:
+                    #         df_raw = pd.DataFrame(storm_raw_profiles[storm_name])
+                    #         df_raw.to_excel(writer, sheet_name=storm_name,
+                    #                         index=False, startrow=len(df_meta) + 1,
+                    #                         startcol=len(df_profile.columns) + 2)
+
     except Exception as e:
-        errmsg = (f"Failed to write output Excel file. "
-                  f"Ensure the file is closed before running the code.\nError: {str(e)}")
-        sg.popup_error(errmsg, title='Error', text_color='black', background_color='white',
-                       button_color=('black', 'lightblue'))
+        errmsg = (
+            "Failed to write output file(s). "
+            "Ensure the file is closed before running the code.\n"
+            f"Error: {e}"
+        )
+        sg.popup_error(
+            errmsg,
+            title='Error',
+            text_color='black',
+            background_color='white',
+            button_color=('black', 'lightblue')
+        )
+
 
     # Build summary plots (histograms of storm durations, magnitudes, and intensities)
     plt.figure(figsize=(8, 3))
@@ -968,12 +1070,12 @@ def separate_outputs(output, storm_profiles, storm_raw_profiles, tip_units, I_in
     sum_plot_path2 = os.path.join(output_path, sum_plot_name2)
     plt.savefig(sum_plot_path2)
 
-    # Plot storm magnitude through time and cumulative rainfall
+    # Plot storm magnitude through time and 15-min rainfall intensity
     fig, ax1 = plt.subplots()
     ax2 = ax1.twinx()
     # plot magnitude data
     ax1.bar(sdates, output['Magnitude'], width=2, align='center', color='blue')
-    ax2.scatter(sdates, output['Peak_i15'], color='black')  # .iloc[:, 0]
+    ax2.scatter(sdates, output['Peak_i15'], color='red', edgecolor='black', linewidth=0.3, zorder=3)  # .iloc[:, 0]
     #  setup x axis labels
     ax1.xaxis.set_ticks(x_dates)
     x_dates_pd = pd.to_datetime(x_dates)
@@ -990,7 +1092,7 @@ def separate_outputs(output, storm_profiles, storm_raw_profiles, tip_units, I_in
     sum_plot_path3 = os.path.join(output_path, sum_plot_name3)
     plt.savefig(sum_plot_path3)
 
-    # sub-sampled time series
+    # add a subsampled time series if supplied
     if plot_end_date or plot_start_date:
         if plot_end_date:
             end_date = datetime.strptime(plot_end_date, '%Y-%m-%d').date()
@@ -1042,12 +1144,12 @@ def separate_outputs(output, storm_profiles, storm_raw_profiles, tip_units, I_in
         sum_plot_path2 = os.path.join(output_path, sum_plot_name2)
         plt.savefig(sum_plot_path2)
 
-        # Plot storm magnitude through time and cumulative rainfall
+        # Plot storm magnitude through time and 15-min rainfall intensity
         fig, ax1 = plt.subplots()
         ax2 = ax1.twinx()
         # plot magnitude data
         ax1.bar(sdates, output['Magnitude'], width=2, align='center', color='blue')
-        ax2.scatter(sdates, output['Peak_i15'], color='black')  # .iloc[:, 0]
+        ax2.scatter(sdates, output['Peak_i15'], color='red', edgecolor='black', linewidth=0.3, zorder=3)
         #  setup x axis labels
         ax1.xaxis.set_ticks(x_dates)
         x_dates_pd = pd.to_datetime(x_dates)
