@@ -409,9 +409,19 @@ def main():
                                                                                                             tip_datetime,
                                                                                                             tip_depth,
                                                                                                             plot_int)
-
                         start_time_abs = storm_data[StormIDX]['start']
                         peakiD_all = []
+
+                        # # return the raw data
+                        # cumulative time in hours
+                        dataset_name = storm_id_name # set a dataset name for the dict
+                        if tip_idx is not None and len(tip_idx) > 0:
+                            cumulative_time_hours = ((tip_datetime[tip_idx] - tip_datetime[tip_idx].iloc[0]).dt.total_seconds()/ 3600.0)
+                            storm_raw_profiles[dataset_name] = {f'TBRG Time Stamp': tip_datetime[tip_idx],  # win_range,
+                                                                f'Cumulative Storm Time (hours)':
+                                                                    np.round(cumulative_time_hours, 2),  # win_range,
+                                                                f'Cumulative Rainfall ({tip_units})':
+                                                                    np.round(cum_rain,2)}
 
                         for interval in I_intervals * 60:  # Convert hours back to minutes for intensity intervals
                             # calculate the peak intensity
@@ -421,12 +431,8 @@ def main():
 
                             # optionally log the storm profile data
                             if data_opt and plot_int == interval and ~np.isnan(peakiDs[1]):
-                                # cumulative time in hours
-                                cumulative_time_hours = (tip_datetime[tip_idx] - tip_datetime[tip_idx].iloc[
-                                    0]).dt.total_seconds() / 3600.0
                                 peak_dt_str = peakiDs[2].strftime('%Y-%m-%d %H:%M:%S')
                                 # store the profile storm profile data
-                                dataset_name = storm_id_name
                                 storm_meta_data = {f'Storm ID:': f'{storm_id_name}',
                                                 f'Start Date & Time:': f'{start_time_abs}',
                                                 f'Storm Duration (hrs):': f'{np.round(duration_min / 60, 2)}',
@@ -440,12 +446,7 @@ def main():
                                                                 # interpolated time range since start of storm
                                                                 f'{plot_int}-min Intensity ({tip_units}/hr)': np.round(iD_Mag,2),
                                                                 f'Storm Metadata': storm_meta_data}
-                                # # return the raw data
-                                storm_raw_profiles[dataset_name] = {f'TBRG Time Stamp': tip_datetime[tip_idx],  # win_range,
-                                                                    f'Cumulative Storm Time (hours)':
-                                                                        np.round(cumulative_time_hours, 2),  # win_range,
-                                                                    f'Cumulative Rainfall ({tip_units})':
-                                                                        np.round(cum_rain,2)}
+
 
                             # optionally plot the storm profile and peak intensity
                             if plot_opt and plot_int == interval and ~np.isnan(peakiDs[1]):

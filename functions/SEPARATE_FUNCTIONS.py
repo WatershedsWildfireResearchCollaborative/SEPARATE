@@ -12,7 +12,7 @@ from collections import defaultdict
 import PySimpleGUI as sg
 from matplotlib.ticker import MaxNLocator
 from scipy import stats
-
+import math
 # this is required for eps and pdf figure saving
 import matplotlib
 matplotlib.use('Agg')
@@ -663,6 +663,7 @@ def output_fitting_parameters_to_file(software_metadata, user_parameters, gap_CV
         StormNumsRec (np.ndarray): Array of storm numbers and suppressed storms.
         output_name (str): The name of the output file.
         gap_plots_path (str): The path to the folder where the plots will be saved.
+        output_ext (str): File extension for output (e.g. '.xlsx' or '.csv').
 
     Returns:
         None
@@ -819,6 +820,7 @@ def separate_outputs(output, storm_profiles, storm_raw_profiles, tip_units, I_in
     software_metadata (list[str]): List of software metadata strings.
     columns (list[str]): List of column names.
     units (list[str]): List of units.
+    output_ext (str): File extension for output (e.g. '.xlsx' or '.csv').
 
     Returns:
     str: Error message (if any) or None.
@@ -1110,6 +1112,58 @@ def separate_outputs(output, storm_profiles, storm_raw_profiles, tip_units, I_in
     sum_plot_name3 = f"{output_name}_magnitude_rainfall_intensity_full{plt_ext}"
     sum_plot_path3 = os.path.join(output_path, sum_plot_name3)
     plt.savefig(sum_plot_path3)
+
+    # Collar et al., 2025 style plot for all storms w/ >2 tips
+    profiles_for_plot = []
+
+    for storm_name in storm_raw_profiles:
+        raw_prof = storm_raw_profiles[storm_name]
+        t = pd.Series(raw_prof.get("Cumulative Storm Time (hours)", []), dtype="float")
+        p = pd.Series(raw_prof.get(f"Cumulative Rainfall ({tip_units})", []), dtype="float")
+
+        if len(t) == 0 or len(p) == 0:
+            continue
+
+        # normalize
+        t_tot = t.max()
+        p_tot = p.max()
+        if t_tot == 0 or p_tot == 0:
+            continue
+
+        profiles_for_plot.append((t / t_tot, p / p_tot))
+
+    if profiles_for_plot:
+        N = len(profiles_for_plot)
+
+
+        alpha = max(math.exp(-math.sqrt(N) / 12.0), 0.05)
+        lw = max(2.0 * (N ** (-0.175)), 0.5)
+
+        fig, ax = plt.subplots()
+        for t_norm, p_norm in profiles_for_plot:
+            ax.plot(t_norm, p_norm, color="black", alpha=alpha, linewidth=lw)
+
+        # 1:1 line in red
+        ax.plot([0, 1], [0, 1], color="red", linewidth=1.0, linestyle="-", label="1:1")
+
+        ax.set_xlim(0, 1)
+        ax.set_ylim(0, 1)
+        ax.set_aspect("equal", adjustable="box")  # square axes
+        ax.grid(True, linestyle="--", linewidth=0.5, alpha=0.7)
+
+        ax.set_xlabel("Elapsed time / Total time")
+        ax.set_ylabel("Cumulative rainfall / Total rainfall")
+
+        # only show legend if you want the 1:1 labeled
+        ax.legend(loc="lower right")
+
+        prof_plot_name = f"{output_name}_all_storm_profiles{plt_ext}"
+        prof_plot_path = os.path.join(output_path, prof_plot_name)
+        plt.tight_layout()
+        plt.savefig(prof_plot_path)
+        plt.close(fig)
+
+
 
     # add a subsampled time series if supplied
     if plot_end_date or plot_start_date:
