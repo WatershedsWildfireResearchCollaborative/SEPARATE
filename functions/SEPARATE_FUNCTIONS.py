@@ -137,7 +137,7 @@ def separate_preprocessing(filename, sheetname, tip_type, tip_mag):
 
 
 def separate_ISC(tip_datetime, tip_depth, isc_t_max, min_depth, min_duration,
-                           gap_plots_path, output_name, plt_ext):
+                           gap_plots_path, output_name, plt_ext, use_excess):
     """
     Computes the optimal inter-event time (MIT) from tipping cup data using the coefficient of variation (CV) method.
 
@@ -150,6 +150,7 @@ def separate_ISC(tip_datetime, tip_depth, isc_t_max, min_depth, min_duration,
         gap_plots_path (str): Path to save ISC analysis plots.
         output_name (str): Output name prefix for plots.
         plt_ext (str): Plot file extension (e.g., '.png').
+        use_excess (bool): Whether to use excess-time formulation for ISC calculation.
 
     Returns:
         tuple: A tuple containing the computed Minimum Inter-Event Time (MIT) and other intermediate results, including:
@@ -167,9 +168,9 @@ def separate_ISC(tip_datetime, tip_depth, isc_t_max, min_depth, min_duration,
         ISC_testintervals = np.concatenate((np.arange(0.1, 1.0, 0.1), np.arange(1, isc_t_max+1)))
 
     StormNumsRec = []
-    mean_IET = np.empty(len(ISC_testintervals))
-    std_IET = np.empty(len(ISC_testintervals))
-    CV_IET = np.empty(len(ISC_testintervals))
+    mean_IET_raw = np.empty(len(ISC_testintervals))
+    std_IET_raw = np.empty(len(ISC_testintervals))
+    CV_IET_raw = np.empty(len(ISC_testintervals))
 
     mean_IET_ex = np.empty(len(ISC_testintervals))
     std_IET_ex = np.empty(len(ISC_testintervals))
@@ -194,36 +195,66 @@ def separate_ISC(tip_datetime, tip_depth, isc_t_max, min_depth, min_duration,
         StormNumsRec.append([N_storms, N_suppressed])
 
         # Compute IET from raw data
-        mean_IET[i] = np.nanmean(ISC_interevent_times)
-        std_IET[i] = np.nanstd(ISC_interevent_times, ddof=1)
-        CV_IET[i] = std_IET[i] / mean_IET[i] if mean_IET[i] != 0 else np.nan
+        mean_IET_raw[i] = np.nanmean(ISC_interevent_times)
+        std_IET_raw[i] = np.nanstd(ISC_interevent_times, ddof=1)
+        CV_IET_raw[i] = std_IET_raw[i] / mean_IET_raw[i] if mean_IET_raw[i] != 0 else np.nan
 
         # Compute IET from excess time data e.g. subtract out the trial interval
-        mean_IET_ex[i] = np.nanmean(ISC_interevent_times - trial_interval)
-        std_IET_ex[i] = np.nanstd(ISC_interevent_times - trial_interval, ddof=1)
-        CV_IET_ex[i] = std_IET_ex[i] / mean_IET_ex[i] if mean_IET_ex[i] != 0 else np.nan
+        if use_excess:
+            mean_IET_ex[i] = np.nanmean(ISC_interevent_times - trial_interval)
+            std_IET_ex[i] = np.nanstd(ISC_interevent_times - trial_interval, ddof=1)
+            CV_IET_ex[i] = std_IET_ex[i] / mean_IET_ex[i] if mean_IET_ex[i] != 0 else np.nan
 
     StormNumsRec = np.array(StormNumsRec)
 
-    # below think aobut if we want to pass excess or raw --- probably should be based on the user choice
-
-    # Find last index where CV_IET > 1.
-    CV0_idx = np.where(CV_IET > 1)[0]
+    # Compute MIT
+    CV0_idx = np.where(CV_IET_raw > 1)[0]
     if CV0_idx.size == 0 or CV0_idx[-1] == len(ISC_testintervals) - 1:
-        errmsg="Warning: ISC analysis did not converge. No MIT value - consider increasing ISC upper limit."
-        print(errmsg)
-        sg.popup_error(errmsg, title='Error', text_color='black', background_color='white',
-                       button_color=('black', 'lightblue'))
-        tb0 = None
-        mean_tb = None
+        if not use_excess:
+            errmsg="Warning: ISC analysis did not converge. No MIT value - consider increasing ISC upper limit."
+            print(errmsg)
+            sg.popup_error(errmsg, title='Error', text_color='black', background_color='white',
+                           button_color=('black', 'lightblue'))
+            tb0_raw = None
+            mean_tb_raw = None
     else:
         cv_last = CV0_idx[-1]
         # Interpolate to get tb0 where CV_IET equals 1.
-        f_tb = interp1d(CV_IET[cv_last:cv_last + 2], ISC_testintervals[cv_last:cv_last + 2])
-        tb0 = f_tb(1.0)
+        f_tb_raw = interp1d(CV_IET_raw[cv_last:cv_last + 2], ISC_testintervals[cv_last:cv_last + 2])
+        tb0_raw = f_tb_raw(1.0)
         # Similarly, interpolate to get mean_IET at tb0.
-        f_mean = interp1d(ISC_testintervals[cv_last:cv_last + 2], mean_IET[cv_last:cv_last + 2])
-        mean_tb = f_mean(tb0)
+        f_mean_raw = interp1d(ISC_testintervals[cv_last:cv_last + 2], mean_IET_raw[cv_last:cv_last + 2])
+        mean_tb_raw = f_mean_raw(tb0_raw)
+
+        if use_excess:
+            # Compute MIT
+            CV0_idx = np.where(CV_IET_raw > 1)[0]
+            if CV0_idx.size == 0 or CV0_idx[-1] == len(ISC_testintervals) - 1:
+                if not use_excess:
+                    errmsg = "Warning: ISC analysis did not converge. No MIT value - consider increasing ISC upper limit."
+                    print(errmsg)
+                    sg.popup_error(errmsg, title='Error', text_color='black', background_color='white',
+                                   button_color=('black', 'lightblue'))
+                    tb0_raw = None
+                    mean_tb_raw = None
+            else:
+                cv_last = CV0_idx[-1]
+                # Interpolate to get tb0 where CV_IET equals 1.
+                f_tb_raw = interp1d(CV_IET_raw[cv_last:cv_last + 2], ISC_testintervals[cv_last:cv_last + 2])
+                tb0_raw = f_tb_raw(1.0)
+                # Similarly, interpolate to get mean_IET at tb0.
+                f_mean_raw = interp1d(ISC_testintervals[cv_last:cv_last + 2], mean_IET_raw[cv_last:cv_last + 2])
+                mean_tb_raw = f_mean_raw(tb0_raw)
+
+    #
+        if use_excess:
+            CV_IET = CV_IET_ex
+            std_IET = std_IET_ex
+            mean_IET = mean_IET_ex
+        else:
+            CV_IET = CV_IET_raw
+            std_IET = std_IET_raw
+            mean_IET = mean_IET_raw
 
         #------------------ Plotting Section ------------------
         # Plot IET statistics

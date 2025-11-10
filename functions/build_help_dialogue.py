@@ -98,6 +98,19 @@ Conditional - Required
 If either tabular or graphical event profile options are selected, then users must select the interval over which rainfall intensity will be calculated and plotted over the course of each storm event. Options include standard sub-hourly to hourly intervals of 5-, 10-, 15-, 30-, and 60-minutes.
 """
 
+    helpmsg13 = """
+Conditional - Required
+    
+When enabled, the Independence Storm Criterion (ISC) is computed using the excess-time formulation of inter-event gaps.
+
+This means each dry interval between storms is reduced by the trial interval (τ) before calculating the coefficient of variation (CV):
+Excess IET = Observed IET − τ
+
+This approach corrects for bias introduced when only dry periods longer than τ are analyzed, and often yields a more consistent CV ≈ 1 threshold for independent storms.
+
+Uncheck this option to use the raw inter-event times instead
+    """
+
     # compile the help messages into a single structure
     help_messages = {
         'info1': helpmsg1,
@@ -112,5 +125,6 @@ If either tabular or graphical event profile options are selected, then users mu
         'info10': helpmsg10,
         'info11': helpmsg11,
         'info12': helpmsg12,
+        'info13': helpmsg13,
     }
     return help_messages

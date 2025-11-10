@@ -176,21 +176,26 @@ def build_SEPARATE_layout():
         [sg.Text("Maximum Inter-event Test Interval",background_color=background_color, font=label_font,
                          text_color=header_color, size=(35, 1), pad=pad2)],
         #5
+        [sg.Button(image_filename=info_button, button_color=('white', 'white'),
+              border_width=0, key='info13', pad=pad1),
+         sg.Checkbox('Use excess-time formulation for ISC Calculation', key='ISC_use_excess', default=True,
+            font=label_font, background_color=background_color, text_color=header_color)],
+        #6
         # [
         # sg.Button(image_filename=info_button, button_color=('white', 'white'), border_width=0, key='info7',pad=pad1),
         # sg.Text("For Maximum Distance Travel Time", background_color=background_color, font=("Arial", 12, "bold"),
         #         text_color=text_color),
         #  ],
-        # #6
+        # #7
         # [sg.Text("Longest Flow Path (planar)", background_color=background_color, font=label_font,
         #                  text_color=header_color, size=(35, 1), pad=pad3)],
-        # #7
+        # #8
         # [sg.Text("Watershed Relief", background_color=background_color, font=label_font,
         #                  text_color=header_color, size=(35, 1), pad=pad3)],
-        # #8
+        # #9
         # [sg.Text("Outlet Bankfull Depth", background_color=background_color, font=label_font,
         #                 text_color=header_color, size=(35, 1), pad=pad3)],
-        # #9
+        # #10
         # [sg.Text("Manning’s Coefficient", background_color=background_color, font=label_font,
         #                  text_color=header_color, size=(35, 1), pad=pad3)],
     ]
