@@ -171,6 +171,10 @@ def separate_ISC(tip_datetime, tip_depth, isc_t_max, min_depth, min_duration,
     std_IET = np.empty(len(ISC_testintervals))
     CV_IET = np.empty(len(ISC_testintervals))
 
+    mean_IET_ex = np.empty(len(ISC_testintervals))
+    std_IET_ex = np.empty(len(ISC_testintervals))
+    CV_IET_ex = np.empty(len(ISC_testintervals))
+
     for i in np.arange(len(ISC_testintervals)):
         trial_interval = ISC_testintervals[i]
 
@@ -188,23 +192,20 @@ def separate_ISC(tip_datetime, tip_depth, isc_t_max, min_depth, min_duration,
 
         N_storms = N_nofilter - N_suppressed
         StormNumsRec.append([N_storms, N_suppressed])
+
+        # Compute IET from raw data
         mean_IET[i] = np.nanmean(ISC_interevent_times)
         std_IET[i] = np.nanstd(ISC_interevent_times, ddof=1)
-        # mean_IET[i] = np.nanmean(ISC_interevent_times - trial_interval)
-        # std_IET[i] = np.nanstd(ISC_interevent_times - trial_interval, ddof=1)
         CV_IET[i] = std_IET[i] / mean_IET[i] if mean_IET[i] != 0 else np.nan
 
-        # # Compute IET statistics (in hours)
-        # if ISC_interevent_times.size > 0:
-        #     mean_IET[i] = np.nanmean(ISC_interevent_times)
-        #     std_IET[i] = np.nanstd(ISC_interevent_times, ddof=1)
-        #     CV_IET[i] = std_IET[i] / mean_IET[i] if mean_IET[i] != 0 else np.nan
-        # else:
-        #     mean_IET[i] = np.nan
-        #     std_IET[i] = np.nan
-        #     CV_IET[i] = np.nan
+        # Compute IET from excess time data e.g. subtract out the trial interval
+        mean_IET_ex[i] = np.nanmean(ISC_interevent_times - trial_interval)
+        std_IET_ex[i] = np.nanstd(ISC_interevent_times - trial_interval, ddof=1)
+        CV_IET_ex[i] = std_IET_ex[i] / mean_IET_ex[i] if mean_IET_ex[i] != 0 else np.nan
 
     StormNumsRec = np.array(StormNumsRec)
+
+    # below think aobut if we want to pass excess or raw --- probably should be based on the user choice
 
     # Find last index where CV_IET > 1.
     CV0_idx = np.where(CV_IET > 1)[0]
