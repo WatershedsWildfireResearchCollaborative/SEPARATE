@@ -331,8 +331,6 @@ def main():
                         # compute storm gap using optimized method
                         isc_data = sf.separate_ISC(tip_datetime, tip_depth, isc_t_max, min_depth, min_duration,
                             gap_plots_path, output_name, plt_ext, isc_use_excess)
-
-                        Fixed_MIT, mean_tb, CV_IET, mean_IET, std_IET, ISC_testintervals, StormNumsRec
                         Fixed_MIT = isc_data['tb0']
                         mean_tb = isc_data['mean_tb']
                         ISC_testintervals = isc_data['ISC_testintervals']
@@ -346,6 +344,9 @@ def main():
                             mean_IET = isc_data['mean_raw']
                             std_IET = isc_data['std_raw']
 
+                        # Fixed_MIT, mean_tb, CV_IET, mean_IET, std_IET, ISC_testintervals, StormNumsRec = sf.separate_ISC(
+                        #     tip_datetime, tip_depth, isc_t_max, min_depth, min_duration,
+                        #     gap_plots_path, output_name, plt_ext)
 
                     elif storm_gap_type == 'RTTC':
                         # note this is not actively included in separate and will be available in future releases
