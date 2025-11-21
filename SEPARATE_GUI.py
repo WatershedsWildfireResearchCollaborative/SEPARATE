@@ -135,10 +135,6 @@ def main():
             isc_time = input_args['isc_interval']  # max inter-event time
             dtype_args['isc_interval'] = 'float'  # set isc time to float
 
-            # toogle on ISC use excess time
-            isc_use_excess = input_args['ISC_use_excess']
-            dtype_args['ISC_use_excess'] = 'bool'  # set isc use excess to bool
-
             # # flow path length
             # flow_dist = input_args['flow_path_len']
             # dtype_args['flow_path_len'] = 'float'
@@ -326,27 +322,9 @@ def main():
                         if not os.path.exists(gap_plots_path):
                             os.makedirs(gap_plots_path, exist_ok=True)
 
-                        print(isc_use_excess)
-
-                        # compute storm gap using optimized method
-                        isc_data = sf.separate_ISC(tip_datetime, tip_depth, isc_t_max, min_depth, min_duration,
-                            gap_plots_path, output_name, plt_ext, isc_use_excess)
-                        Fixed_MIT = isc_data['tb0']
-                        mean_tb = isc_data['mean_tb']
-                        ISC_testintervals = isc_data['ISC_testintervals']
-                        StormNumsRec = isc_data['StormNumsRec']
-                        if isc_use_excess:
-                            CV_IET = isc_data['CV_ex']
-                            mean_IET = isc_data['mean_ex']
-                            std_IET = isc_data['std_ex']
-                        else:
-                            CV_IET = isc_data['CV_raw']
-                            mean_IET = isc_data['mean_raw']
-                            std_IET = isc_data['std_raw']
-
-                        # Fixed_MIT, mean_tb, CV_IET, mean_IET, std_IET, ISC_testintervals, StormNumsRec = sf.separate_ISC(
-                        #     tip_datetime, tip_depth, isc_t_max, min_depth, min_duration,
-                        #     gap_plots_path, output_name, plt_ext)
+                        Fixed_MIT, mean_tb, CV_IET, mean_IET, std_IET, ISC_testintervals, StormNumsRec = sf.separate_ISC(
+                            tip_datetime, tip_depth, isc_t_max, min_depth, min_duration,
+                            gap_plots_path, output_name, plt_ext)
 
                     elif storm_gap_type == 'RTTC':
                         # note this is not actively included in separate and will be available in future releases

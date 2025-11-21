@@ -135,151 +135,9 @@ def separate_preprocessing(filename, sheetname, tip_type, tip_mag):
     # Return dates, tib values, logging interval and start and end dates of the record
     return tip_datetime, tip_depth, logging_interval, start_date, end_date
 
-# old version
-# def separate_ISC(tip_datetime, tip_depth, isc_t_max, min_depth, min_duration,
-#                            gap_plots_path, output_name, plt_ext):
-#     """
-#     Computes the optimal inter-event time (MIT) from tipping cup data using the coefficient of variation (CV) method.
-#
-#     Args:
-#         tip_datetime (pd.Series): Pandas Series of datetime objects for each tip.
-#         tip_depth (np.ndarray): NumPy array of tip depth values.
-#         isc_t_max (float): Maximum inter-event test interval (hours) for ISC.
-#         min_depth (float): Minimum storm magnitude (tip units).
-#         min_duration (float): Minimum storm duration (hours).
-#         gap_plots_path (str): Path to save ISC analysis plots.
-#         output_name (str): Output name prefix for plots.
-#         plt_ext (str): Plot file extension (e.g., '.png').
-#
-#     Returns:
-#         tuple: A tuple containing the computed Minimum Inter-Event Time (MIT) and other intermediate results, including:
-#             - tb0 (float): The optimal Minimum Inter-Event Time (MIT) computed by interpolation.
-#             - CV_IET (np.ndarray): The coefficient of variation (CV) of the inter-event times.
-#             - mean_IET (np.ndarray): The mean of the inter-event times.
-#             - std_IET (np.ndarray): The standard deviation of the inter-event times.
-#             - ISC_testintervals (np.ndarray): The tested inter-event intervals.
-#             - StormNumsRec (np.ndarray): The number of included and suppressed storms for each test interval.
-#     """
-#     # Create test intervals: 0.1 to 0.9 in steps of 0.1, then 1 to isc_time in steps of 1 (inclusive)
-#     if isc_t_max < 1:
-#         ISC_testintervals = np.arange(0.1, isc_t_max, 0.1)
-#     else:
-#         ISC_testintervals = np.concatenate((np.arange(0.1, 1.0, 0.1), np.arange(1, isc_t_max+1)))
-#
-#     StormNumsRec = []
-#     mean_IET = np.empty(len(ISC_testintervals))
-#     std_IET = np.empty(len(ISC_testintervals))
-#     CV_IET = np.empty(len(ISC_testintervals))
-#
-#     for i in np.arange(len(ISC_testintervals)):
-#         trial_interval = ISC_testintervals[i]
-#
-#         # Clear variables (not needed in Python, so we just call the functions)
-#         ISC_storm_data, ISC_interevent_times = separate_storms(tip_datetime, tip_depth, trial_interval)
-#
-#         try:
-#             ISC_storm_data, ISC_interevent_times, N_nofilter, N_suppressed = \
-#                 separate_filter(ISC_storm_data, ISC_interevent_times, min_depth, min_duration)
-#         except:
-#             print('No valid data at this window size')
-#             ISC_interevent_times = []
-#             N_nofilter = len(ISC_storm_data)
-#             N_suppressed = len(ISC_storm_data)
-#
-#         N_storms = N_nofilter - N_suppressed
-#         StormNumsRec.append([N_storms, N_suppressed])
-#
-#         mean_IET[i] = np.nanmean(ISC_interevent_times - trial_interval)
-#         std_IET[i] = np.nanstd(ISC_interevent_times - trial_interval, ddof=1)
-#         CV_IET[i] = std_IET[i] / mean_IET[i] if mean_IET[i] != 0 else np.nan
-#
-#         # # Compute IET statistics (in hours)
-#         # if ISC_interevent_times.size > 0:
-#         #     mean_IET[i] = np.nanmean(ISC_interevent_times)
-#         #     std_IET[i] = np.nanstd(ISC_interevent_times, ddof=1)
-#         #     CV_IET[i] = std_IET[i] / mean_IET[i] if mean_IET[i] != 0 else np.nan
-#         # else:
-#         #     mean_IET[i] = np.nan
-#         #     std_IET[i] = np.nan
-#         #     CV_IET[i] = np.nan
-#
-#     StormNumsRec = np.array(StormNumsRec)
-#
-#     # Find last index where CV_IET > 1.
-#     CV0_idx = np.where(CV_IET > 1)[0]
-#     if CV0_idx.size == 0 or CV0_idx[-1] == len(ISC_testintervals) - 1:
-#         errmsg="Warning: ISC analysis did not converge. No MIT value - consider increasing ISC upper limit."
-#         print(errmsg)
-#         sg.popup_error(errmsg, title='Error', text_color='black', background_color='white',
-#                        button_color=('black', 'lightblue'))
-#         tb0 = None
-#         mean_tb = None
-#     else:
-#         cv_last = CV0_idx[-1]
-#         # Interpolate to get tb0 where CV_IET equals 1.
-#         f_tb = interp1d(CV_IET[cv_last:cv_last + 2], ISC_testintervals[cv_last:cv_last + 2])
-#         tb0 = f_tb(1.0)
-#         # Similarly, interpolate to get mean_IET at tb0.
-#         f_mean = interp1d(ISC_testintervals[cv_last:cv_last + 2], mean_IET[cv_last:cv_last + 2])
-#         mean_tb = f_mean(tb0)
-#
-#         #------------------ Plotting Section ------------------
-#         # Plot IET statistics
-#         fig, axs = plt.subplots(1, 2, figsize=(12, 4))
-#         axs[0].plot(ISC_testintervals, 1 / mean_IET, 'r-', linewidth=1, label='Mean of Time Between Storms')
-#         axs[0].plot(ISC_testintervals, 1 / std_IET, 'b-', linewidth=1, label='Std Dev of Time Between Storms')
-#         if tb0 is not None and mean_tb is not None:
-#             axs[0].plot(tb0, 1 / mean_tb, 'ko', markersize=8, label='Minimum Inter-event Time (MIT)')
-#         axs[0].set_ylim([0, axs[0].get_ylim()[1]])
-#         axs[0].set_xlim([0, np.max(ISC_testintervals)])
-#         axs[0].set_xticks(np.arange(0, np.max(ISC_testintervals), 6))
-#         if tb0 is not None:
-#             axs[0].text(tb0 + 1, 1 + axs[0].get_ylim()[1] / 20, f"MIT = {tb0:.1f} hrs")
-#         # axs[0].set_title("Analysis of Inter-event Independence")
-#         axs[0].legend(loc='upper right')
-#         axs[0].set_xlabel("Tested Inter-Event Interval [hrs]")
-#         axs[0].set_ylabel("Time [hrs$^{-1}$]")
-#         axs[0].grid(True)
-#
-#         axs[1].plot(ISC_testintervals, CV_IET, 'k-', linewidth=1, label='CV')
-#         if tb0 is not None:
-#             axs[1].plot(tb0, 1, 'ko', markersize=7)
-#             axs[1].text(tb0 + 1, 1 + axs[1].get_ylim()[1] / 20, f"MIT = {tb0:.1f} hrs")
-#         axs[1].set_ylim([0, axs[1].get_ylim()[1]])
-#         axs[1].set_xlim([0, np.max(ISC_testintervals)])
-#         axs[1].set_xticks(np.arange(0, np.max(ISC_testintervals), 6))
-#         # axs[1].set_title("Independence Criterion")
-#         axs[1].set_xlabel("Tested Inter-Event Interval [hrs]")
-#         axs[1].set_ylabel("CV")
-#         axs[1].grid(True)
-#
-#         # Save the first figure
-#         plot_fid = os.path.join(gap_plots_path, output_name + '_IndependenceCriterion' + plt_ext)
-#         plt.savefig(plot_fid)
-#         plt.close(fig)
-#
-#         # plot up the number of storms included and suppressed
-#         fig2, ax2 = plt.subplots(figsize=(8, 6))
-#         frac_included = StormNumsRec[:, 0] / (StormNumsRec[:, 0] + StormNumsRec[:, 1])
-#         frac_suppressed = StormNumsRec[:, 1] / (StormNumsRec[:, 0] + StormNumsRec[:, 1])
-#         ax2.plot(ISC_testintervals, frac_included, linewidth=1.5, label='Included Storms')
-#         ax2.plot(ISC_testintervals, frac_suppressed, linewidth=1.5, label='Suppressed Storms')
-#         if tb0 is not None:
-#             ax2.plot([tb0, tb0], [0, 1], 'k--', linewidth=1, label='MIT')
-#         ax2.set_ylabel('Fraction of Identified Storms')
-#         ax2.set_xlabel("Tested Inter-Event Interval [hrs]")
-#         ax2.legend(loc='upper right')
-#         ax2.grid(True)
-#         plot_fid = os.path.join(gap_plots_path, output_name + '_SuppressedStorms' + plt_ext)
-#         plt.savefig(plot_fid)  # save
-#         plt.close()
-#
-#         return tb0, mean_tb, CV_IET, mean_IET,std_IET, ISC_testintervals, StormNumsRec
 
-
-#%% new version
 def separate_ISC(tip_datetime, tip_depth, isc_t_max, min_depth, min_duration,
-                           gap_plots_path, output_name, plt_ext, use_excess):
+                           gap_plots_path, output_name, plt_ext):
     """
     Computes the optimal inter-event time (MIT) from tipping cup data using the coefficient of variation (CV) method.
 
@@ -292,34 +150,15 @@ def separate_ISC(tip_datetime, tip_depth, isc_t_max, min_depth, min_duration,
         gap_plots_path (str): Path to save ISC analysis plots.
         output_name (str): Output name prefix for plots.
         plt_ext (str): Plot file extension (e.g., '.png').
-        use_excess (bool): Whether to use excess-time formulation for ISC calculation.
 
     Returns:
-        dict: A dictionary containing ISC analysis results, including both raw and excess-time formulations.
-        Keys include:
-
-            # Primary (active) results used for plotting and  processing
-            - "tb0" (float): The optimal Minimum Inter-Event Time (MIT) selected for output (based on user choice).
-            - "mean_tb" (float): The mean inter-event time at the selected MIT.
-            - "ISC_testintervals" (np.ndarray): Array of tested inter-event intervals (hours).
-            - "StormNumsRec" (np.ndarray): Number of included and suppressed storms for each test interval.
-            - "isc_calc_method" (str): Indicates which ISC formulation was used for plotting and summary
-              ("excess" or "raw").
-
-            # Raw formulation results
-            - "tb0_raw" (float): MIT estimated from the raw inter-event time distribution.
-            - "mean_tb_raw" (float): Mean inter-event time at tb0_raw.
-            - "CV_raw" (np.ndarray): Coefficient of variation of raw inter-event times.
-            - "mean_raw" (np.ndarray): Mean raw inter-event time for each test interval.
-            - "std_raw" (np.ndarray): Standard deviation of raw inter-event times.
-
-            # Excess-time formulation results
-            - "tb0_ex" (float): MIT estimated from the excess-time (IET – τ) formulation.
-            - "mean_tb_ex" (float): Mean excess inter-event time at tb0_ex.
-            - "CV_ex" (np.ndarray): Coefficient of variation of excess inter-event times.
-            - "mean_ex" (np.ndarray): Mean excess inter-event time for each test interval.
-            - "std_ex" (np.ndarray): Standard deviation of excess inter-event times.
-
+        tuple: A tuple containing the computed Minimum Inter-Event Time (MIT) and other intermediate results, including:
+            - tb0 (float): The optimal Minimum Inter-Event Time (MIT) computed by interpolation.
+            - CV_IET (np.ndarray): The coefficient of variation (CV) of the inter-event times.
+            - mean_IET (np.ndarray): The mean of the inter-event times.
+            - std_IET (np.ndarray): The standard deviation of the inter-event times.
+            - ISC_testintervals (np.ndarray): The tested inter-event intervals.
+            - StormNumsRec (np.ndarray): The number of included and suppressed storms for each test interval.
     """
     # Create test intervals: 0.1 to 0.9 in steps of 0.1, then 1 to isc_time in steps of 1 (inclusive)
     if isc_t_max < 1:
@@ -327,17 +166,12 @@ def separate_ISC(tip_datetime, tip_depth, isc_t_max, min_depth, min_duration,
     else:
         ISC_testintervals = np.concatenate((np.arange(0.1, 1.0, 0.1), np.arange(1, isc_t_max+1)))
 
-    # Initialize Arrays
     StormNumsRec = []
-    mean_IET_raw = np.empty(len(ISC_testintervals))
-    std_IET_raw = np.empty(len(ISC_testintervals))
-    CV_IET_raw = np.empty(len(ISC_testintervals))
+    mean_IET = np.empty(len(ISC_testintervals))
+    std_IET = np.empty(len(ISC_testintervals))
+    CV_IET = np.empty(len(ISC_testintervals))
 
-    mean_IET_ex = np.empty(len(ISC_testintervals))
-    std_IET_ex = np.empty(len(ISC_testintervals))
-    CV_IET_ex = np.empty(len(ISC_testintervals))
-
-    for i in np.arange(len(ISC_testintervals)): # loop over intervals
+    for i in np.arange(len(ISC_testintervals)):
         trial_interval = ISC_testintervals[i]
 
         # Clear variables (not needed in Python, so we just call the functions)
@@ -346,7 +180,7 @@ def separate_ISC(tip_datetime, tip_depth, isc_t_max, min_depth, min_duration,
         try:
             ISC_storm_data, ISC_interevent_times, N_nofilter, N_suppressed = \
                 separate_filter(ISC_storm_data, ISC_interevent_times, min_depth, min_duration)
-        except Exception:
+        except:
             print('No valid data at this window size')
             ISC_interevent_times = []
             N_nofilter = len(ISC_storm_data)
@@ -355,166 +189,92 @@ def separate_ISC(tip_datetime, tip_depth, isc_t_max, min_depth, min_duration,
         N_storms = N_nofilter - N_suppressed
         StormNumsRec.append([N_storms, N_suppressed])
 
-        # Check that  ISC times are array
-        iet_arr = np.asarray(ISC_interevent_times, dtype=float)
+        mean_IET[i] = np.nanmean(ISC_interevent_times - trial_interval)
+        std_IET[i] = np.nanstd(ISC_interevent_times - trial_interval, ddof=1)
+        CV_IET[i] = std_IET[i] / mean_IET[i] if mean_IET[i] != 0 else np.nan
 
-        # Compute IET from raw data
-        if iet_arr.size == 0:
-            mean_IET_raw[i] = np.nan
-            std_IET_raw[i] = np.nan
-            CV_IET_raw[i] = np.nan
-        else:
-            mean_IET_raw[i] = np.nanmean(iet_arr)
-            std_IET_raw[i] = np.nanstd(iet_arr, ddof=1)
-            CV_IET_raw[i] = std_IET_raw[i] / mean_IET_raw[i] if mean_IET_raw[i] != 0 else np.nan
-
-        # Compute IET from excess time data e.g. subtract out the trial interval
-        excess = iet_arr - trial_interval
-        # excess = excess[excess >= 0]  # drop negatives
-        # excess[excess < 0] = 0  # set negatives to zero
-        if excess.size == 0:
-            mean_IET_ex[i] = np.nan
-            std_IET_ex[i] = np.nan
-            CV_IET_ex[i] = np.nan
-        else:
-            mean_IET_ex[i] = np.nanmean(excess)
-            std_IET_ex[i] = np.nanstd(excess, ddof=1)
-            CV_IET_ex[i] = std_IET_ex[i] / mean_IET_ex[i] if mean_IET_ex[i] != 0 else np.nan
+        # # Compute IET statistics (in hours)
+        # if ISC_interevent_times.size > 0:
+        #     mean_IET[i] = np.nanmean(ISC_interevent_times)
+        #     std_IET[i] = np.nanstd(ISC_interevent_times, ddof=1)
+        #     CV_IET[i] = std_IET[i] / mean_IET[i] if mean_IET[i] != 0 else np.nan
+        # else:
+        #     mean_IET[i] = np.nan
+        #     std_IET[i] = np.nan
+        #     CV_IET[i] = np.nan
 
     StormNumsRec = np.array(StormNumsRec)
 
-    # Compute MIT
-    tb0_raw = None
-    mean_tb_raw = None
-    tb0_ex = None
-    mean_tb_ex = None
-
-    # raw data
-    CV0_idx = np.where(CV_IET_raw > 1)[0]
+    # Find last index where CV_IET > 1.
+    CV0_idx = np.where(CV_IET > 1)[0]
     if CV0_idx.size == 0 or CV0_idx[-1] == len(ISC_testintervals) - 1:
-        if not use_excess:
-            errmsg="Warning: ISC analysis did not converge. No MIT value - consider increasing ISC upper limit."
-            print(errmsg)
-            sg.popup_error(errmsg, title='Error', text_color='black', background_color='white',
-                           button_color=('black', 'lightblue'))
+        errmsg="Warning: ISC analysis did not converge. No MIT value - consider increasing ISC upper limit."
+        print(errmsg)
+        sg.popup_error(errmsg, title='Error', text_color='black', background_color='white',
+                       button_color=('black', 'lightblue'))
+        tb0 = None
+        mean_tb = None
     else:
         cv_last = CV0_idx[-1]
         # Interpolate to get tb0 where CV_IET equals 1.
-        f_tb_raw = interp1d(CV_IET_raw[cv_last:cv_last + 2], ISC_testintervals[cv_last:cv_last + 2])
-        tb0_raw = float(f_tb_raw(1.0))
+        f_tb = interp1d(CV_IET[cv_last:cv_last + 2], ISC_testintervals[cv_last:cv_last + 2])
+        tb0 = f_tb(1.0)
         # Similarly, interpolate to get mean_IET at tb0.
-        f_mean_raw = interp1d(ISC_testintervals[cv_last:cv_last + 2], mean_IET_raw[cv_last:cv_last + 2])
-        mean_tb_raw = float(f_mean_raw(tb0_raw))
+        f_mean = interp1d(ISC_testintervals[cv_last:cv_last + 2], mean_IET[cv_last:cv_last + 2])
+        mean_tb = f_mean(tb0)
 
+        #------------------ Plotting Section ------------------
+        # Plot IET statistics
+        fig, axs = plt.subplots(1, 2, figsize=(12, 4))
+        axs[0].plot(ISC_testintervals, 1 / mean_IET, 'r-', linewidth=1, label='Mean of Time Between Storms')
+        axs[0].plot(ISC_testintervals, 1 / std_IET, 'b-', linewidth=1, label='Std Dev of Time Between Storms')
+        if tb0 is not None and mean_tb is not None:
+            axs[0].plot(tb0, 1 / mean_tb, 'ko', markersize=8, label='Minimum Inter-event Time (MIT)')
+        axs[0].set_ylim([0, axs[0].get_ylim()[1]])
+        axs[0].set_xlim([0, np.max(ISC_testintervals)])
+        axs[0].set_xticks(np.arange(0, np.max(ISC_testintervals), 6))
+        if tb0 is not None:
+            axs[0].text(tb0 + 1, 1 + axs[0].get_ylim()[1] / 20, f"MIT = {tb0:.1f} hrs")
+        # axs[0].set_title("Analysis of Inter-event Independence")
+        axs[0].legend(loc='upper right')
+        axs[0].set_xlabel("Tested Inter-Event Interval [hrs]")
+        axs[0].set_ylabel("Time [hrs$^{-1}$]")
+        axs[0].grid(True)
 
-    # excess time
-    # Compute MIT
-    CV0_idx = np.where(CV_IET_ex > 1)[0]
-    if CV0_idx.size == 0 or CV0_idx[-1] == len(ISC_testintervals) - 1:
-        if use_excess:
-            errmsg = "Warning: ISC analysis did not converge. No MIT value - consider increasing ISC upper limit."
-            print(errmsg)
-            sg.popup_error(errmsg, title='Error', text_color='black', background_color='white',
-                           button_color=('black', 'lightblue'))
-    else:
-        cv_last = CV0_idx[-1]
-        # Interpolate to get tb0 where CV_IET equals 1.
-        f_tb_ex = interp1d(CV_IET_ex[cv_last:cv_last + 2], ISC_testintervals[cv_last:cv_last + 2])
-        tb0_ex = float(f_tb_ex(1.0))
-        # Similarly, interpolate to get mean_IET at tb0.
-        f_mean_ex = interp1d(ISC_testintervals[cv_last:cv_last + 2], mean_IET_ex[cv_last:cv_last + 2])
-        mean_tb_ex = float(f_mean_ex(tb0_ex))
+        axs[1].plot(ISC_testintervals, CV_IET, 'k-', linewidth=1, label='CV')
+        if tb0 is not None:
+            axs[1].plot(tb0, 1, 'ko', markersize=7)
+            axs[1].text(tb0 + 1, 1 + axs[1].get_ylim()[1] / 20, f"MIT = {tb0:.1f} hrs")
+        axs[1].set_ylim([0, axs[1].get_ylim()[1]])
+        axs[1].set_xlim([0, np.max(ISC_testintervals)])
+        axs[1].set_xticks(np.arange(0, np.max(ISC_testintervals), 6))
+        # axs[1].set_title("Independence Criterion")
+        axs[1].set_xlabel("Tested Inter-Event Interval [hrs]")
+        axs[1].set_ylabel("CV")
+        axs[1].grid(True)
 
-    # generate plots based on excess or raw ISC
-    if use_excess and tb0_ex is not None:
-        CV_IET = CV_IET_ex
-        std_IET = std_IET_ex
-        mean_IET = mean_IET_ex
-        tb0 = tb0_ex
-        mean_tb = mean_tb_ex
-    else:
-        CV_IET = CV_IET_raw
-        std_IET = std_IET_raw
-        mean_IET = mean_IET_raw
-        tb0 = tb0_raw
-        mean_tb = mean_tb_raw
+        # Save the first figure
+        plot_fid = os.path.join(gap_plots_path, output_name + '_IndependenceCriterion' + plt_ext)
+        plt.savefig(plot_fid)
+        plt.close(fig)
 
-    #------------------ Plotting Section ------------------
-    # Plot IET statistics
-    fig, axs = plt.subplots(1, 2, figsize=(12, 4))
-    axs[0].plot(ISC_testintervals, 1 / mean_IET, 'r-', linewidth=1, label='Mean of Time Between Storms')
-    axs[0].plot(ISC_testintervals, 1 / std_IET, 'b-', linewidth=1, label='Std Dev of Time Between Storms')
-    if tb0 is not None and mean_tb is not None:
-        axs[0].plot(tb0, 1 / mean_tb, 'ko', markersize=8, label='Minimum Inter-event Time (MIT)')
-    axs[0].set_ylim([0, axs[0].get_ylim()[1]])
-    axs[0].set_xlim([0, np.max(ISC_testintervals)])
-    axs[0].set_xticks(np.arange(0, np.max(ISC_testintervals), 6))
-    if tb0 is not None:
-        axs[0].text(tb0 + 1, 1 + axs[0].get_ylim()[1] / 20, f"MIT = {tb0:.1f} hrs")
-    # axs[0].set_title("Analysis of Inter-event Independence")
-    axs[0].legend(loc='upper right')
-    axs[0].set_xlabel("Tested Inter-Event Interval [hrs]")
-    axs[0].set_ylabel("Time [hrs$^{-1}$]")
-    axs[0].grid(True)
+        # plot up the number of storms included and suppressed
+        fig2, ax2 = plt.subplots(figsize=(8, 6))
+        frac_included = StormNumsRec[:, 0] / (StormNumsRec[:, 0] + StormNumsRec[:, 1])
+        frac_suppressed = StormNumsRec[:, 1] / (StormNumsRec[:, 0] + StormNumsRec[:, 1])
+        ax2.plot(ISC_testintervals, frac_included, linewidth=1.5, label='Included Storms')
+        ax2.plot(ISC_testintervals, frac_suppressed, linewidth=1.5, label='Suppressed Storms')
+        if tb0 is not None:
+            ax2.plot([tb0, tb0], [0, 1], 'k--', linewidth=1, label='MIT')
+        ax2.set_ylabel('Fraction of Identified Storms')
+        ax2.set_xlabel("Tested Inter-Event Interval [hrs]")
+        ax2.legend(loc='upper right')
+        ax2.grid(True)
+        plot_fid = os.path.join(gap_plots_path, output_name + '_SuppressedStorms' + plt_ext)
+        plt.savefig(plot_fid)  # save
+        plt.close()
 
-    axs[1].plot(ISC_testintervals, CV_IET, 'k-', linewidth=1, label='CV')
-    if tb0 is not None:
-        axs[1].plot(tb0, 1, 'ko', markersize=7)
-        axs[1].text(tb0 + 1, 1 + axs[1].get_ylim()[1] / 20, f"MIT = {tb0:.1f} hrs")
-    axs[1].set_ylim([0, axs[1].get_ylim()[1]])
-    axs[1].set_xlim([0, np.max(ISC_testintervals)])
-    axs[1].set_xticks(np.arange(0, np.max(ISC_testintervals), 6))
-    # axs[1].set_title("Independence Criterion")
-    axs[1].set_xlabel("Tested Inter-Event Interval [hrs]")
-    axs[1].set_ylabel("CV")
-    axs[1].grid(True)
-
-    # Save the first figure
-    plot_fid = os.path.join(gap_plots_path, output_name + '_IndependenceCriterion' + plt_ext)
-    plt.savefig(plot_fid)
-    plt.close(fig)
-
-    # plot up the number of storms included and suppressed
-    fig2, ax2 = plt.subplots(figsize=(8, 6))
-    frac_included = StormNumsRec[:, 0] / (StormNumsRec[:, 0] + StormNumsRec[:, 1])
-    frac_suppressed = StormNumsRec[:, 1] / (StormNumsRec[:, 0] + StormNumsRec[:, 1])
-    ax2.plot(ISC_testintervals, frac_included, linewidth=1.5, label='Included Storms')
-    ax2.plot(ISC_testintervals, frac_suppressed, linewidth=1.5, label='Suppressed Storms')
-    if tb0 is not None:
-        ax2.plot([tb0, tb0], [0, 1], 'k--', linewidth=1, label='MIT')
-    ax2.set_ylabel('Fraction of Identified Storms')
-    ax2.set_xlabel("Tested Inter-Event Interval [hrs]")
-    ax2.legend(loc='upper right')
-    ax2.grid(True)
-    plot_fid = os.path.join(gap_plots_path, output_name + '_SuppressedStorms' + plt_ext)
-    plt.savefig(plot_fid)  # save
-    plt.close()
-
-    out_data =  {
-        # ISC results to pass to remaining code
-        "tb0": tb0,
-        "mean_tb": mean_tb,
-        "ISC_testintervals": ISC_testintervals,
-        "StormNumsRec": StormNumsRec,
-        "isc_calc_method": "excess" if (use_excess and tb0_ex is not None) else "raw",
-
-        # values computed from raw dataset
-        "tb0_raw": tb0_raw,
-        "mean_tb_raw": mean_tb_raw,
-        "CV_raw": CV_IET_raw,
-        "mean_raw": mean_IET_raw,
-        "std_raw": std_IET_raw,
-
-        # values computed from excess dataset
-        "tb0_ex": tb0_ex,
-        "mean_tb_ex": mean_tb_ex,
-        "CV_ex": CV_IET_ex,
-        "mean_ex": mean_IET_ex,
-        "std_ex": std_IET_ex,
-
-    }
-
-    return out_data #tb0, mean_tb, CV_IET, mean_IET,std_IET, ISC_testintervals, StormNumsRec
+        return tb0, mean_tb, CV_IET, mean_IET,std_IET, ISC_testintervals, StormNumsRec
 
 
 def separate_storms(tip_datetime, tip_depth, test_interval):
