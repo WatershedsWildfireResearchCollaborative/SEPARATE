@@ -216,8 +216,9 @@ def main():
 
             else:
                 storm_gap_type = 'ISC'
-                print('Storm gap type not valid. Defaulting to Statistically Independent Storms')
-                # print('Turn this into a warning message')
+                sg_warning = 'Storm gap type not valid. Defaulting to Statistically Independent Storms'
+                sg.popup_no_wait(sg_warning, title="Warning", text_color='black', background_color='white',
+                                 button_color=('black', 'lightblue'))
 
             # if minimum depth is not selected default the value to 0
             if not min_depth_TF:

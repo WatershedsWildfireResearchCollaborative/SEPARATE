@@ -264,7 +264,7 @@ def separate_ISC(tip_datetime, tip_depth, isc_t_max, min_depth, min_duration,
         plt.savefig(plot_fid)  # save
         plt.close()
 
-        return tb0, mean_tb, CV_IET, mean_IET,std_IET, ISC_testintervals, StormNumsRec
+    return tb0, mean_tb, CV_IET, mean_IET,std_IET, ISC_testintervals, StormNumsRec
 
 
 def separate_storms(tip_datetime, tip_depth, test_interval):

@@ -5,6 +5,7 @@ import pytest
 import matplotlib
 import pandas as pd
 import numpy as np
+from functions import SEPARATE_FUNCTIONS as sf
 
 # Headless plotting for any figures the code may produce
 matplotlib.use("Agg")
@@ -58,6 +59,66 @@ def tmp_outdir(tmp_path):
     return p
 
 
+# swap this real data out with the synthetic data in the near future
+@pytest.fixture(scope="session")
+def fixed_input_file():
+    return (
+        r"tests/data/ExampleData_FixedInterval.xlsx",
+        None,
+        "Fixed Interval",
+        0.2,
+    )
+
+@pytest.fixture(scope="session")
+def cumulative_input_file():
+    return (
+        r"tests/data/ExampleData_CumulativeTips.xlsx",
+        None,
+        "Cumulative Tips",
+        0.2,
+    )
+
+@pytest.fixture
+def preprocessed_fixed(fixed_input_file):
+    """
+    Run separate_preprocessing on the fixed-interval example file
+    and return its outputs for reuse in multiple tests.
+    """
+    path, sheet, tip_type, tip_mag = fixed_input_file
+    tip_dt, tip_depth, log_int, start_dt, end_dt = sf.separate_preprocessing(
+        path, sheet, tip_type, tip_mag
+    )
+    return tip_dt, tip_depth, log_int, start_dt, end_dt
+
+
+@pytest.fixture
+def preprocessed_cumulative(cumulative_input_file):
+    """
+    Run separate_preprocessing on the cumulative tips example file.
+    """
+    path, sheet, tip_type, tip_mag = cumulative_input_file
+    tip_dt, tip_depth, log_int, start_dt, end_dt = sf.separate_preprocessing(
+        path, sheet, tip_type, tip_mag
+    )
+    return tip_dt, tip_depth, log_int, start_dt, end_dt
+
+@pytest.fixture
+def simple_tip_series():
+    """
+    Small synthetic tipping series for logic tests.
+    Times (hours): 0.0, 0.5, 1.0, 4.0, 4.5
+    Depths: uniform 1.0 mm per tip (easier for analytical tests)
+    """
+    tip_mag = 0.2
+    base = pd.Timestamp("2025-01-01 00:00:00")
+    tip_datetime = pd.Series(
+        [base + pd.Timedelta(hours=h) for h in [0.0, 0.5, 1.0, 4.0, 4.5]]
+    )
+    tip_depth = np.ones(5) * tip_mag  # uniform tip size
+    return tip_datetime, tip_depth
+
+# Scrap code
+
 
 # # Create synthetic datetime data with constant spacing
 # times = pd.date_range("2025-01-01", periods=10, freq="10min")
@@ -77,22 +138,3 @@ def tmp_outdir(tmp_path):
 # df = pd.DataFrame({"datetime": times, "value": np.arange(len(times))})
 # fp = tmp_path / "test_cum.csv"
 # df.to_csv(fp, index=False)
-
-# swap this real data out with the synthetic data in the near future
-@pytest.fixture(scope="session")
-def fixed_input_file():
-    return (
-        r"tests/data/ExampleData_FixedInterval.xlsx",
-        None,
-        "Fixed Interval",
-        0.2,
-    )
-
-@pytest.fixture(scope="session")
-def cumulative_input_file():
-    return (
-        r"tests/data/ExampleData_CumulativeTips.xlsx",
-        None,
-        "Cumulative Tips",
-        0.2,
-    )
