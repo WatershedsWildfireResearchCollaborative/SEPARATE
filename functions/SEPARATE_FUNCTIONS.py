@@ -189,19 +189,9 @@ def separate_ISC(tip_datetime, tip_depth, isc_t_max, min_depth, min_duration,
         N_storms = N_nofilter - N_suppressed
         StormNumsRec.append([N_storms, N_suppressed])
 
-        mean_IET[i] = np.nanmean(ISC_interevent_times - trial_interval)
-        std_IET[i] = np.nanstd(ISC_interevent_times - trial_interval, ddof=1)
+        mean_IET[i] = np.nanmean(ISC_interevent_times)
+        std_IET[i] = np.nanstd(ISC_interevent_times, ddof=1)
         CV_IET[i] = std_IET[i] / mean_IET[i] if mean_IET[i] != 0 else np.nan
-
-        # # Compute IET statistics (in hours)
-        # if ISC_interevent_times.size > 0:
-        #     mean_IET[i] = np.nanmean(ISC_interevent_times)
-        #     std_IET[i] = np.nanstd(ISC_interevent_times, ddof=1)
-        #     CV_IET[i] = std_IET[i] / mean_IET[i] if mean_IET[i] != 0 else np.nan
-        # else:
-        #     mean_IET[i] = np.nan
-        #     std_IET[i] = np.nan
-        #     CV_IET[i] = np.nan
 
     StormNumsRec = np.array(StormNumsRec)
 
@@ -838,53 +828,44 @@ def separate_outputs(output, storm_profiles, storm_raw_profiles, tip_units, I_in
 
     errmsg = None
     is_csv = output_ext.lower() == ".csv"
-    # stack all the data
-    all_profiles_rows = []
+
+    # initialize arrays for intensity and cumulative profiles
+    intensity_rows = []
+    cumulative_rows = []
 
     if data_opt:
         for storm_name, profile_data in storm_profiles.items():
-            # left block (profile)
-            left = pd.DataFrame({
-                "Storm ID": storm_name,
-                "Cumulative Storm Time (hours)": profile_data.get("Cumulative Storm Time (hours)", []),
-                "Intensity Profile (mm/hr)": profile_data.get(
-                    f"{plot_int}-min Intensity ({tip_units}/hr)", []
-                ),
-            })
+            # intensity profile
+            t_profile = profile_data.get("Cumulative Storm Time (hours)", [])
+            i_profile = profile_data.get( f"{plot_int}-min Intensity ({tip_units}/hr)", [])
 
-            # right block (raw)
-            raw_profile = storm_raw_profiles.get(storm_name)
-            if raw_profile is not None:
-                right = pd.DataFrame({
+            for t_val, i_val in zip(t_profile, i_profile):
+                intensity_rows.append({
                     "Storm ID": storm_name,
-                    "TBRG Time Stamp": raw_profile.get("TBRG Time Stamp", []),
-                    "Cumulative Storm Time (hours) (raw)": raw_profile.get("Cumulative Storm Time (hours)", []),
-                    f"Cumulative Rainfall ({tip_units})": raw_profile.get(
-                        f"Cumulative Rainfall ({tip_units})", []
-                    ),
+                    "Cumulative Storm Time (hours)": t_val,
+                    "Intensity Profile (mm/hr)": i_val,
                 })
-            else:
-                right = pd.DataFrame()
 
-            #  pad the shorter one to the length of the longer one
-            max_len = max(len(left), len(right))
-            left = left.reindex(range(max_len))
-            right = right.reindex(range(max_len))
+            # raw cumulative profile
+            raw_profile = storm_raw_profiles.get(storm_name)
+            if raw_profile is None:
+                continue
 
-            # build two empty columns between the datasets
-            blanks = pd.DataFrame({
-                "": [np.nan] * max_len,
-                " ": [np.nan] * max_len
-            })
+            ts_list = raw_profile.get("TBRG Time Stamp", [])
+            t_raw = raw_profile.get("Cumulative Storm Time (hours)", [])
+            r_raw = raw_profile.get(f"Cumulative Rainfall ({tip_units})", [])
 
-            combined = pd.concat([left, blanks, right], axis=1)
-            all_profiles_rows.append(combined)
+            for ts, t_val, r_val in zip(ts_list, t_raw, r_raw):
+                cumulative_rows.append({
+                    "Storm ID": storm_name,
+                    "TBRG Time Stamp": ts,
+                    "Cumulative Storm Time (hours)": t_val,
+                    "Cumulative Rainfall (mm)": r_val,
+                })
 
-    # final stacked table
-    all_profiles_df = (
-        pd.concat(all_profiles_rows, ignore_index=True)
-        if all_profiles_rows else pd.DataFrame()
-    )
+    # convert to DataFrames
+    intensity_df = pd.DataFrame(intensity_rows) if intensity_rows else pd.DataFrame()
+    cumulative_df = pd.DataFrame(cumulative_rows) if cumulative_rows else pd.DataFrame()
 
     try:
         if is_csv:
@@ -905,10 +886,16 @@ def separate_outputs(output, storm_profiles, storm_raw_profiles, tip_units, I_in
                 # 5. actual summary table (no header, since headers just written)
                 output.to_csv(f, index=False, header=False)
 
-            # Write all profiles file
-            if data_opt and not all_profiles_df.empty:
-                all_profiles_df.to_csv(
-                    os.path.join(output_path, f"{output_name}_All_Storm_Profiles.csv"),
+            # Write ntensity and cumulative profiles
+            if data_opt and not intensity_df.empty:
+                intensity_df.to_csv(
+                    os.path.join(output_path, f"{output_name}_All_Intensity_Profiles.csv"),
+                    index=False
+                )
+
+            if data_opt and not cumulative_df.empty:
+                cumulative_df.to_csv(
+                    os.path.join(output_path, f"{output_name}_All_Cumulative_Profiles.csv"),
                     index=False
                 )
 
@@ -937,23 +924,23 @@ def separate_outputs(output, storm_profiles, storm_raw_profiles, tip_units, I_in
             sheetname = "Storms_Summary"
             with pd.ExcelWriter(output_table_fid, engine='openpyxl') as writer:
                 # metadata
-                software_metadata_df.to_excel(writer, sheet_name=sheetname,
-                                              index=False, startrow=0, header=False)
+                software_metadata_df.to_excel(writer, sheet_name=sheetname, index=False, startrow=0, header=False)
                 s_row = len(software_metadata) + 1
-                user_parameters_df.to_excel(writer, sheet_name=sheetname,
-                                            index=False, startrow=s_row, header=False)
+                user_parameters_df.to_excel(writer, sheet_name=sheetname, index=False, startrow=s_row, header=False)
 
                 # headers + summary
                 s_row = s_row + len(header_parameters) + 1
-                output_headers.to_excel(writer, sheet_name=sheetname,
-                                        index=False, startrow=s_row)
+                output_headers.to_excel(writer, sheet_name=sheetname, index=False, startrow=s_row)
                 s_row = s_row + 2
-                output.to_excel(writer, sheet_name=sheetname,
-                                index=False, startrow=s_row, header=False)
+                output.to_excel(writer, sheet_name=sheetname, index=False, startrow=s_row, header=False)
 
-                # stacked tables as extra sheets
-                if data_opt and not all_profiles_df.empty:
-                    all_profiles_df.to_excel(writer, sheet_name="All_Storm_Profiles", index=False)
+                # long-form intensity + cumulative profiles as extra sheets
+                if data_opt and not intensity_df.empty:
+                    intensity_df.to_excel(writer, sheet_name="Intensity_Profiles", index=False)
+
+                if data_opt and not cumulative_df.empty:
+                    cumulative_df.to_excel(writer, sheet_name="Cumulative_Profiles", index=False )
+
 
                     # # keep per-storm sheets
                     # for storm_name, profile_data in storm_profiles.items():
@@ -981,15 +968,9 @@ def separate_outputs(output, storm_profiles, storm_raw_profiles, tip_units, I_in
         errmsg = (
             "Failed to write output file(s). "
             "Ensure the file is closed before running the code.\n"
-            f"Error: {e}"
-        )
-        sg.popup_error(
-            errmsg,
-            title='Error',
-            text_color='black',
-            background_color='white',
-            button_color=('black', 'lightblue')
-        )
+            f"Error: {e}")
+        sg.popup_error(errmsg, title='Error', text_color='black',  background_color='white',
+                       button_color=('black', 'lightblue'))
 
 
     # Build summary plots (histograms of storm durations, magnitudes, and intensities)
