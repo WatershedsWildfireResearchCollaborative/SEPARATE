@@ -677,6 +677,11 @@ def output_fitting_parameters_to_file(software_metadata, user_parameters, gap_CV
                             suppress_storms.flatten().reshape(-1, 1)))
 
     values_df = pd.DataFrame(combined_xy, columns=columns)
+    # apply rounding for outputs
+    values_df['Coefficient_of_Variation'] = values_df['Coefficient_of_Variation'].round(3)
+    values_df['Mean'] = values_df['Mean'].round(2)
+    values_df['Standard_Deviation'] = values_df['Standard_Deviation'].round(2)
+
     # output = pd.DataFrame(values_df, columns=columns)
     output_headers = pd.DataFrame([units], columns=columns)
 
