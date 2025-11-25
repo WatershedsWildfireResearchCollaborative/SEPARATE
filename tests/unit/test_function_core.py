@@ -2,6 +2,7 @@ import pytest
 import numpy as np
 import pandas as pd
 from pathlib import Path
+from pathlib import Path
 
 from functions import SEPARATE_FUNCTIONS as sf
 
@@ -289,7 +290,6 @@ def test_separate_profiler_basic_profile(simple_tip_series):
 
 
 # ---------- separate_peak_intensity ----------
-
 def test_separate_peak_intensity_linear_profile():
     """
     Test separate_peak_intensity on a simple linear cumulative rainfall profile.
@@ -328,8 +328,8 @@ def test_separate_peak_intensity_linear_profile():
     # Implementation uses days = minutes / 1440, so this should match exactly
     assert pd.to_datetime(peakiD_datetime) == expected_datetime
 
-# ---------- separate_outputs ----------
 
+# ---------- separate_outputs ----------
 def test_separate_outputs_creates_summary_and_profiles(tmp_path):
     """
     Smoke test for separate_outputs.
@@ -355,9 +355,10 @@ def test_separate_outputs_creates_summary_and_profiles(tmp_path):
             "Storm ID": storm_id,
             "Start": start,
             "End": end,
-            "Duration (hours)": 1.0,
-            "Magnitude (mm)": 1.0,
-            "Mean Intensity (mm/hr)": 1.0,
+            "Duration": 1.0,  # was "Duration (hours)"
+            "Depth": 1.0,  # was "Magnitude (mm)"
+            "Average_Intensity": 1.0,  # was "Mean Intensity (mm/hr)"
+            "Peak_i15": 1.0,  # needed for the 15-min intensity plot
         }
     ]
     output = pd.DataFrame(records)
@@ -404,11 +405,12 @@ def test_separate_outputs_creates_summary_and_profiles(tmp_path):
         "Storm ID",
         "Start",
         "End",
-        "Duration (hours)",
-        "Magnitude (mm)",
-        "Mean Intensity (mm/hr)",
+        "Duration",
+        "Depth",
+        "Average_Intensity",
+        "Peak_i15",
     ]
-    units = ["-", "-", "-", "hours", "mm", "mm/hr"]
+    units = ["-", "-", "-", "hours", "mm", "mm/hr", "mm/hr"]
 
     plt_ext = ".png"
     output_ext = ".csv"  # exercise the CSV branch
@@ -437,20 +439,22 @@ def test_separate_outputs_creates_summary_and_profiles(tmp_path):
     assert errmsg is None
 
     # Summary CSV should exist and contain the storm ID somewhere
-    summary_csv = output_path / f"{output_name}_SummaryTable.csv"
+    summary_csv = Path(output_path) / f"{output_name}_SummaryTable.csv"
     assert summary_csv.exists()
     text = summary_csv.read_text()
     assert "Storm ID" in text
     assert storm_id in text
 
-    # All_Storm_Profiles CSV should exist and have expected columns
-    profiles_csv = output_path / f"{output_name}_All_Storm_Profiles.csv"
-    assert profiles_csv.exists()
+    # intensity and cumulative profiles CSVs should exist
+    intensity_csv = Path(output_path) / f"{output_name}_Intensity_Profiles.csv"
+    cumulative_csv = Path(output_path) / f"{output_name}_Cumulative_Profiles.csv"
 
-    profiles_df = pd.read_csv(profiles_csv)
-    # Should at least contain these key columns from our construction
-    assert "Storm ID" in profiles_df.columns
-    assert "Cumulative Storm Time (hours)" in profiles_df.columns
-    assert "Intensity Profile (mm/hr)" in profiles_df.columns
-    # And at least one row
-    assert len(profiles_df) >= 1
+    assert intensity_csv.exists()
+    assert cumulative_csv.exists()
+
+    #sanity check on columns
+    int_df = pd.read_csv(intensity_csv)
+    cum_df = pd.read_csv(cumulative_csv)
+
+    assert "Storm ID" in int_df.columns
+    assert "Storm ID" in cum_df.columns

@@ -398,7 +398,7 @@ def separate_filter(storm_data, interevent_times, min_mag, min_dur):
     # Build flag indices based on the criteria.
     for i, storm in enumerate(storm_data):
         duration = storm['duration']
-        magnitude = storm[col_depth]
+        magnitude = storm['magnitude']
         # Apply filtering logic
         if min_dur is not None and min_mag is not None:
             if duration > min_dur and magnitude > min_mag:
@@ -556,12 +556,48 @@ def plot_inter_event_histogram(filtered_interevent_times, mean_tb, Fixed_MIT, ga
     y_vals = lam * np.exp(-lam * x_vals)
 
     # Create bins using fixed MIT
-    bins = np.arange(0, max_time + Fixed_MIT, Fixed_MIT)
+    # bins = np.arange(0, max_time + Fixed_MIT, Fixed_MIT)
+    # bin_width = np.round(Fixed_MIT,2)
+
+    def choose_bins_interevent(vals, target_bins=18, min_bins=5, max_bins=25):
+        vals = np.asarray(vals, dtype=float)
+        if vals.size < 2:
+            return np.array([0.0, 1.0])
+
+        x_min = 0.0
+        x_max = float(np.nanmax(vals))
+        if not np.isfinite(x_max) or x_max <= x_min:
+            return np.array([x_min, x_min + 1.0])
+
+        # Raw width from target bin count
+        data_range = x_max - x_min
+        raw_width = data_range / float(target_bins)
+
+        # Round to a "pleasant" width: nearest 0.1 hr, min 0.1 hr
+        width = max(0.1, round(raw_width, 1))
+
+        # Enforce min/max bin counts
+        approx_bins = data_range / width
+        n_bins = int(np.clip(np.ceil(approx_bins), min_bins, max_bins))
+
+        # Recompute width so that bins cover the range nicely
+        width = data_range / n_bins
+        # Re-round width to keep it clean
+        width = max(0.1, round(width, 1))
+
+        # Build bin edges from 0 to cover the range
+        x_max_adj = x_min + n_bins * width
+        bins = np.arange(x_min, x_max_adj + width * 0.5, width)
+
+        return bins
+
+    bins = choose_bins_interevent(filtered_interevent_times)
+    bin_width = bins[1] - bins[0]
 
     # Plot
     fig, ax = plt.subplots(figsize=(8, 6))
     ax.hist(filtered_interevent_times, bins=bins, density=True, alpha=0.75,
-            label=f'Histogram (bin width = {np.round(Fixed_MIT,2)})')
+            label=f'Histogram (bin width = {bin_width})', edgecolor='black')
     ax.plot(x_vals, y_vals, 'r-', lw=2, label='Exponential Fit')
 
     ax.set_xlabel("Inter-Event Time [hours]")
@@ -767,7 +803,8 @@ def separate_profile_plots(interval, tip_units, Peak_int, Peak_time, t_fit, R_fi
     fig, ax1 = plt.subplots()
     ax2 = ax1.twinx()
     ax1.plot(x2,y2, 'r-')
-    ax1.plot(Peak_time/60, Peak_int, 'ro') # plot peak as a red dot
+    ax1.plot(Peak_time/60, Peak_int, marker = 'o', linestyle= 'none', markerfacecolor='red', markeredgecolor='black',
+             markeredgewidth=0.5)
 
     ax1.set_ylabel(f'{int(interval)}-minute Intensity, ' + tip_units + r'/hr', color='r')
     ax1.tick_params('y', colors='r')

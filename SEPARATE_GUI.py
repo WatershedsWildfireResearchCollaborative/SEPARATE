@@ -436,7 +436,7 @@ def main():
                                 storm_meta_data = {f'Storm ID:': f'{storm_id_name}',
                                                 f'Start Date & Time:': f'{start_time_abs}',
                                                 f'Storm Duration (hrs):': f'{np.round(duration_min / 60, 2)}',
-                                                f'Storm Magnitude ({tip_units}):': f'{np.round(len(tip_idx) * tip_mag, 2)}',
+                                                f'Depth ({tip_units}):': f'{np.round(len(tip_idx) * tip_mag, 2)}',
                                                 f'Peak {int(interval)}-min Intensity ({tip_units}/hr):': f'{round(peakiDs[1], 2)}',
                                                 f'Peak Intensity Date and Time:': f'{peak_dt_str}',
                                                 f'Number of Tips': f'{len(tip_idx)}'}
@@ -454,7 +454,7 @@ def main():
                                 fig_title = (f'{output_name}\n'
                                             f'Storm ID:{storm_id_name}\n'  # int(storms_in[i])
                                             f'Start Date & Time: {start_time_abs}\n'
-                                            f'Storm Magnitude ({tip_units}): {np.round(len(tip_idx) * tip_mag, 2)}\n'
+                                            f'Depth ({tip_units}): {np.round(len(tip_idx) * tip_mag, 2)}\n'
                                             f'Peak {int(interval)}-min Intensity ({tip_units}/hr): {round(peakiDs[1], 2)}\n'
                                             f'Peak Intensity Date and Time:{peak_dt_str}\n'
                                             )
@@ -533,14 +533,14 @@ def main():
                     # build output dataframe
                     output = pd.DataFrame(storm_record)
 
-                    # rename fields for excel/csv outputs
-                    # 2. Rename columns:
+                    # rename fields for Excel/csv outputs
+                    # 2. Rename columns: # Note the separate outputs function requires these names
                     output.rename(columns={
                         'start': 'Start',
                         'end': 'End',
                         'duration': 'Duration',
-                        'magnitude': 'Magnitude',
-                        'intensity_avg': 'Storm_Intensity',
+                        'magnitude': 'Depth',
+                        'intensity_avg': 'Average_Intensity',
                     }, inplace=True)
 
 
