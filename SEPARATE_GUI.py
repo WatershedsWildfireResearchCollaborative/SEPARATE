@@ -533,7 +533,7 @@ def main():
                     # build output dataframe
                     output = pd.DataFrame(storm_record)
 
-                    # rename fields for excel outputs
+                    # rename fields for excel/csv outputs
                     # 2. Rename columns:
                     output.rename(columns={
                         'start': 'Start',
@@ -546,7 +546,7 @@ def main():
 
                     # Define columns for the summary table.
                     # Basic storm data plus peak intensities for each intensity interval.
-                    columns = ['StormID', 'Start', 'End', 'Duration', 'Magnitude', 'Storm_Intensity'] + \
+                    columns = ['StormID', 'Start', 'End', 'Duration', 'Depth', 'Average_Intensity'] + \
                             [f'Peak_i{int(60 * I_int)}' for I_int in I_intervals] + \
                             [f'Peak_i{int(60 * I_int)}_time' for I_int in I_intervals]
 

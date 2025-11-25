@@ -398,7 +398,7 @@ def separate_filter(storm_data, interevent_times, min_mag, min_dur):
     # Build flag indices based on the criteria.
     for i, storm in enumerate(storm_data):
         duration = storm['duration']
-        magnitude = storm['magnitude']
+        magnitude = storm[col_depth]
         # Apply filtering logic
         if min_dur is not None and min_mag is not None:
             if duration > min_dur and magnitude > min_mag:
@@ -894,13 +894,13 @@ def separate_outputs(output, storm_profiles, storm_raw_profiles, tip_units, I_in
             # Write ntensity and cumulative profiles
             if data_opt and not intensity_df.empty:
                 intensity_df.to_csv(
-                    os.path.join(output_path, f"{output_name}_All_Intensity_Profiles.csv"),
+                    os.path.join(output_path, f"{output_name}_Intensity_Profiles.csv"),
                     index=False
                 )
 
             if data_opt and not cumulative_df.empty:
                 cumulative_df.to_csv(
-                    os.path.join(output_path, f"{output_name}_All_Cumulative_Profiles.csv"),
+                    os.path.join(output_path, f"{output_name}_Cumulative_Profiles.csv"),
                     index=False
                 )
 
@@ -977,34 +977,37 @@ def separate_outputs(output, storm_profiles, storm_raw_profiles, tip_units, I_in
         sg.popup_error(errmsg, title='Error', text_color='black',  background_color='white',
                        button_color=('black', 'lightblue'))
 
+    col_depth = 'Depth'
+    col_int = 'Average_Intensity'
+    col_dur = 'Duration'
 
     # Build summary plots (histograms of storm durations, magnitudes, and intensities)
     plt.figure(figsize=(8, 3))
     plt.subplot(1, 3, 1)
-    data_to_plot = output['Duration']
+    data_to_plot = output[col_dur]
     hist_values, bin_edges, _ = plt.hist(data_to_plot, bins=10, edgecolor='black')
     plt.locator_params(axis='x', nbins=5)
     lf = hist_values.max()
     plt.ylim(0, lf + 1)
-    plt.xlabel('Storm Duration, hours')
+    plt.xlabel('Duration, hours')
     plt.ylabel('Frequency')
 
     plt.subplot(1, 3, 2)
-    data_to_plot = output['Magnitude']
+    data_to_plot = output[col_depth]
     hist_values, bin_edges, _ = plt.hist(data_to_plot, bins=10, edgecolor='black')
     plt.locator_params(axis='x', nbins=5)
     lf = hist_values.max()
     plt.ylim(0, lf + 1)
-    plt.xlabel(f'Storm Magnitude, {tip_units}')
+    plt.xlabel(f'Depth, {tip_units}')
     plt.ylabel('Frequency')
 
     plt.subplot(1, 3, 3)
-    data_to_plot = output['Storm_Intensity']
+    data_to_plot = output[col_int]
     hist_values, bin_edges, _ = plt.hist(data_to_plot, bins=10, edgecolor='black')
     plt.locator_params(axis='x', nbins=5)
     lf = hist_values.max()
     plt.ylim(0, lf + 1)
-    plt.xlabel(f'Storm Intensity, {tip_units}/hr')
+    plt.xlabel(f'Average Intensity, {tip_units}/hr')
     plt.ylabel('Frequency')
 
     # Adjust spacing between subplots
@@ -1053,13 +1056,13 @@ def separate_outputs(output, storm_profiles, storm_raw_profiles, tip_units, I_in
     dates = [start_date + timedelta(days=int(i)) for i in np.linspace(0, data_len, num_dates, endpoint=True)]
     x_dates = pd.Series(dates)  # final dates to label on x axis
 
-    # Plot storm magnitude through time and cumulative rainfall
+    # Plot storm magnitude (depth) through time and cumulative rainfall
     fig, ax1 = plt.subplots()
     ax2 = ax1.twinx()
     # plot magnitude data
-    ax1.bar(sdates, output['Magnitude'], width=2, align='center', color='blue')
-    # ax2.plot(sdates, np.cumsum(output['Magnitude']), color='black')
-    ax2.step(sdates, np.cumsum(output['Magnitude']), color='black', where='post')
+    ax1.bar(sdates, output[col_depth], width=2, align='center', color='blue')
+    # ax2.plot(sdates, np.cumsum(output[col_depth]), color='black')
+    ax2.step(sdates, np.cumsum(output[col_depth]), color='black', where='post')
     #  setup x axis labels
     ax1.xaxis.set_ticks(x_dates)
     x_dates_pd = pd.to_datetime(x_dates)
@@ -1069,18 +1072,18 @@ def separate_outputs(output, storm_profiles, storm_raw_profiles, tip_units, I_in
     ax1.tick_params(axis='x', labelrotation=90)
     plt.subplots_adjust(bottom=0.3)  # Adjust the value as needed
     ax2.set_ylabel('Cumulative Rainfall, ' + tip_units, color='black')
-    ax1.set_ylabel('Storm Magnitude,' + tip_units, color='blue')
+    ax1.set_ylabel('Depth,' + tip_units, color='blue')
     fig_title = (f'{output_name}: {start_date} - {end_date}')
     plt.title(fig_title, fontsize=14)
-    sum_plot_name2 = f"{output_name}_magnitude_cumulative_rainfall_full{plt_ext}"
+    sum_plot_name2 = f"{output_name}_depth_cumulative_rainfall_full{plt_ext}"
     sum_plot_path2 = os.path.join(output_path, sum_plot_name2)
     plt.savefig(sum_plot_path2)
 
-    # Plot storm magnitude through time and 15-min rainfall intensity
+    # Plot storm magnitude (depth) through time and 15-min rainfall intensity
     fig, ax1 = plt.subplots()
     ax2 = ax1.twinx()
     # plot magnitude data
-    ax1.bar(sdates, output['Magnitude'], width=2, align='center', color='blue')
+    ax1.bar(sdates, output[col_depth], width=2, align='center', color='blue')
     ax2.scatter(sdates, output['Peak_i15'], color='red', edgecolor='black', linewidth=0.3, zorder=3)  # .iloc[:, 0]
     #  setup x axis labels
     ax1.xaxis.set_ticks(x_dates)
@@ -1091,7 +1094,7 @@ def separate_outputs(output, storm_profiles, storm_raw_profiles, tip_units, I_in
     ax1.tick_params(axis='x', labelrotation=90)
     plt.subplots_adjust(bottom=0.3)  # Adjust the value as needed
     ax2.set_ylabel(f'15-minute Intensity,  {tip_units}/hr', color='black')
-    ax1.set_ylabel('Storm Magnitude,' + tip_units, color='blue')
+    ax1.set_ylabel('Depth,' + tip_units, color='blue')
     fig_title = (f'{output_name}: {start_date} - {end_date}')
     plt.title(fig_title, fontsize=14)
     sum_plot_name3 = f"{output_name}_magnitude_rainfall_intensity_full{plt_ext}"
@@ -1180,12 +1183,12 @@ def separate_outputs(output, storm_profiles, storm_raw_profiles, tip_units, I_in
         # dates = [start_date + timedelta(days=i * step_size) for i in range(num_dates)]
         # x_dates = pd.Series(dates)  # final dates to label on x axis
 
-        # Plot storm magnitude through time and cumulative rainfall
+        # Plot storm magnitude (Depth) through time and cumulative rainfall
         fig, ax1 = plt.subplots()
         ax2 = ax1.twinx()
         # plot magnitude data
-        ax1.bar(sdates, output['Magnitude'], width=2, align='center', color='blue')
-        ax2.step(sdates, np.cumsum(output['Magnitude']), color='black', where='post')
+        ax1.bar(sdates, output[col_depth], width=2, align='center', color='blue')
+        ax2.step(sdates, np.cumsum(output[col_depth]), color='black', where='post')
         #  setup x axis labels
         ax1.xaxis.set_ticks(x_dates)
         x_dates_pd = pd.to_datetime(x_dates)
@@ -1195,7 +1198,7 @@ def separate_outputs(output, storm_profiles, storm_raw_profiles, tip_units, I_in
         ax1.tick_params(axis='x', labelrotation=90)
         plt.subplots_adjust(bottom=0.3)  # Adjust the value as needed
         ax2.set_ylabel('Cumulative Rainfall, ' + tip_units, color='black')
-        ax1.set_ylabel('Storm Magnitude,' + tip_units, color='blue')
+        ax1.set_ylabel('Depth,' + tip_units, color='blue')
         fig_title = (f'{output_name}: {start_date} - {end_date}')
         plt.title(fig_title, fontsize=14)
         sum_plot_name2 = f"{output_name}_magnitude_cumulative_rainfall_sub{plt_ext}"
@@ -1206,7 +1209,7 @@ def separate_outputs(output, storm_profiles, storm_raw_profiles, tip_units, I_in
         fig, ax1 = plt.subplots()
         ax2 = ax1.twinx()
         # plot magnitude data
-        ax1.bar(sdates, output['Magnitude'], width=2, align='center', color='blue')
+        ax1.bar(sdates, output[col_depth], width=2, align='center', color='blue')
         ax2.scatter(sdates, output['Peak_i15'], color='red', edgecolor='black', linewidth=0.3, zorder=3)
         #  setup x axis labels
         ax1.xaxis.set_ticks(x_dates)
@@ -1217,7 +1220,7 @@ def separate_outputs(output, storm_profiles, storm_raw_profiles, tip_units, I_in
         ax1.tick_params(axis='x', labelrotation=90)
         plt.subplots_adjust(bottom=0.3)  # Adjust the value as needed
         ax2.set_ylabel(f'15-minute Intensity,  {tip_units}/hr', color='black')
-        ax1.set_ylabel('Storm Magnitude,' + tip_units, color='blue')
+        ax1.set_ylabel('Depth,' + tip_units, color='blue')
         fig_title = (f'{output_name}: {start_date} - {end_date}')
         plt.title(fig_title, fontsize=14)
         sum_plot_name3 = f"{output_name}_magnitude_rainfall_intensity_sub{plt_ext}"
