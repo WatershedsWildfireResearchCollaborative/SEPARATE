@@ -2,7 +2,6 @@ import pytest
 import numpy as np
 import pandas as pd
 from pathlib import Path
-from pathlib import Path
 
 from functions import SEPARATE_FUNCTIONS as sf
 
@@ -152,6 +151,64 @@ def test_separate_filter_removes_small_storm(simple_tip_series):
     assert isinstance(filtered_iet, np.ndarray)
     assert filtered_iet.size == 0
 
+
+def test_separate_filter_removes_interior_storm_and_merges_IETs():
+    """
+    Build 3 storms where the middle one is small and should be removed by min_mag.
+    Check that:
+        - we end up with 2 storms,
+        - the new single interevent time is the sum of the two original IETs.
+    """
+    base = pd.Timestamp("2025-01-01 00:00:00")
+    tip_mag = 0.2
+
+    # Storm 1: tips at 0, 0.5, 1 h
+    s1_times = [base + pd.Timedelta(hours=h) for h in [0, 0.5, 1.0]]
+
+    # Gap 3 h -> Storm 2: 2 tips at 4, 4.5 h
+    s2_times = [base + pd.Timedelta(hours=h) for h in [4.0, 4.5]]
+
+    # Gap 5.5 h -> Storm 3: tips at 10, 10.5, 11 h
+    s3_times = [base + pd.Timedelta(hours=h) for h in [10.0, 10.5, 11.0]]
+
+    tip_datetime = pd.Series(s1_times + s2_times + s3_times)
+    tip_depth = np.ones(len(tip_datetime)) * tip_mag
+
+    # First, split into storms at 2 h threshold
+    storms, interevent_times = sf.separate_storms(tip_datetime, tip_depth, test_interval=2.0)
+
+    # Sanity: 3 storms, 2 IETs
+    assert len(storms) == 3
+    assert interevent_times.shape == (2,)
+
+    # Original IETs (in hours): 3.0 and 5.5
+    assert np.allclose(interevent_times, [3.0, 5.5])
+
+    # Magnitudes in tip units:
+    mags = [s["magnitude"] for s in storms]
+    assert np.allclose(mags, [3 * tip_mag, 2 * tip_mag, 3 * tip_mag])
+
+    # Choose min_mag to keep storms 1 and 3, drop storm 2
+    min_mag = 3 * tip_mag - 0.01  # slightly below big storms, above small one
+    min_dur = 0.0
+
+    filtered_storms, filtered_iet, N_nofilter, N_suppressed = sf.separate_filter(
+        storms, interevent_times.copy(), min_mag=min_mag, min_dur=min_dur)
+
+    assert N_nofilter == 3
+    assert N_suppressed == 1
+
+    # Now only storms 0 and 2 remain
+    assert len(filtered_storms) == 2
+    remaining_indices_lists = [s["indices"] for s in filtered_storms]
+    assert remaining_indices_lists == [storms[0]["indices"], storms[2]["indices"]]
+
+    # The two original IETs should be merged into one
+    assert isinstance(filtered_iet, np.ndarray)
+    assert filtered_iet.shape == (1,)
+    assert pytest.approx(filtered_iet[0], rel=1e-6) == 3.0 + 5.5
+
+
 # ----------  ISC I/O smoke test ----------
 def test_separate_ISC_smoke(simple_tip_series, tmp_path, monkeypatch):
     """
@@ -287,6 +344,32 @@ def test_separate_profiler_basic_profile(simple_tip_series):
 
     # At least one finite intensity value should exist
     assert np.isfinite(iD_Mag).any()
+
+
+def test_separate_profiler_returns_none_for_two_tip_storm():
+    """
+    separate_profiler should return all None when the storm has <= 2 tips.
+    """
+    base = pd.Timestamp("2025-01-01 00:00:00")
+    tip_datetime = pd.Series([base, base + pd.Timedelta(minutes=30)])
+    tip_depth = np.array([0.2, 0.2])
+
+    # Build a minimal storm_data list with one storm having only 2 tips
+    storms, _ = sf.separate_storms(tip_datetime, tip_depth, test_interval=10.0)
+    # Sanity: single storm with 2 indices
+    assert len(storms) == 1
+    assert len(storms[0]["indices"]) == 2
+
+    iD_Mag, iD_time, R_fit, t_fit, tip_idx, cum_rain, duration_min = sf.separate_profiler(
+        0, storms, tip_datetime, tip_depth, int_min=30)
+
+    assert iD_Mag is None
+    assert iD_time is None
+    assert R_fit is None
+    assert t_fit is None
+    assert tip_idx is None
+    assert cum_rain is None
+    assert duration_min is None
 
 
 # ---------- separate_peak_intensity ----------
@@ -458,3 +541,27 @@ def test_separate_outputs_creates_summary_and_profiles(tmp_path):
 
     assert "Storm ID" in int_df.columns
     assert "Storm ID" in cum_df.columns
+
+
+# ---------- histogram generation ----------
+def test_plot_inter_event_histogram_smoke(tmp_path):
+    # Simple synthetic IETs
+    iet = np.array([0.5, 1.0, 1.5, 2.0, 3.0])
+    mean_tb = float(np.mean(iet))
+    Fixed_MIT = 2.0
+
+    outdir = tmp_path / "plots"
+    outdir.mkdir()
+    # This is the actual name used in SEPARATE_FUNCTIONS.plot_inter_event_histogram
+    out_file = outdir / "test_ExponentialFit.png"
+
+    sf.plot_inter_event_histogram(
+        filtered_interevent_times=iet,
+        mean_tb=mean_tb,
+        Fixed_MIT=Fixed_MIT,
+        gap_plots_path=str(outdir),
+        output_name="test",
+        plt_ext=".png",
+    )
+
+    assert out_file.exists()

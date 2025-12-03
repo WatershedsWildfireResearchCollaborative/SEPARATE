@@ -6,8 +6,8 @@ Authors:
     Scott R. David (Utah State University)
     Brendan P. Murphy (Simon Fraser University)
 
-Version: 1.0
-Last Updated: 2025-04-10
+Version: 1.1
+Last Updated: 2025-12-01
 License: MIT License
 
 Description:
@@ -42,8 +42,13 @@ Citation:
 
 
 # %% import required packages
+software_metadata = ['SEPARATE - Summary Storm Event Output Table', 'Version 1.1 (12/01/2025)',
+                     'Licensed under the MIT License.']
 import numpy as np
 from datetime import datetime
+import pandas as pd
+import os
+
 # from functions.build_SEPARATE_layout import build_SEPARATE_layout
 try:
     # Try import if installed via pip (PyPI)
@@ -62,13 +67,6 @@ except ImportError:
             "or are running this script from the cloned repository with the correct folder structure."
         )
 
-import pandas as pd
-import os
-
-
-
-software_metadata = ['SEPARATE - Summary Storm Event Output Table', 'Version 1.0 (03/01/2025)',
-                     'Licensed under the MIT License.']
 # ===================== USER CONFIGURATION SECTION ===================== #
 # Define all user-specified inputs here before running the script.
 # ====================================================================== #
@@ -123,19 +121,16 @@ elif storm_gap_type_name == 'Independent Storms Criterion (ISC)':
         48 hours may increase processing times, this can also lead to poorer fits and lower confidence in the selection of the MIT
         """
         print(isc_warning)
-    #     sg.popup_no_wait(isc_warning, title="Warning",text_color='black', background_color='white',
-    #              button_color=('black', 'lightblue'))
 
 else:
     storm_gap_type = 'ISC'
     print('Storm gap type not valid. Defaulting to Statistically Independent Storms')
-    # print('Turn this into a warning message')
 
-# if minimum depth is not selected default the value to 0
+# if minimum depth is not selected default the value to None
 if not min_depth_TF :
     min_depth = None
 
-# if minimum duration is not selected default the value to 0
+# if minimum duration is not selected default the value to None
 if not min_duration_TF:
     min_duration = None
 
@@ -147,8 +142,6 @@ if plot_start_date:
     except:
         error_msg_dates = "Input date formats can not be interpreted please input date as YYYY-MM-DD "
         raise ValueError(error_msg_dates)
-        # sg.popup_error(error_msg_dates, title='Invalid Dates', text_color='black',
-        #                background_color='white', button_color=('black', 'lightblue'))
         tf_date = False
 
 if plot_end_date:
@@ -157,11 +150,9 @@ if plot_end_date:
     except:
         error_msg_dates = "Input date formats can not be interpreted please input date as YYYY-MM-DD "
         raise ValueError(error_msg_dates)
-
-        # sg.popup_error(error_msg_dates, title='Invalid Dates', text_color='black',
-        #                background_color='white', button_color=('black', 'lightblue'))
         tf_date = False
 
+# user inputs checking
 
 
 #%%  ................................Execute SEPARATE algorithm...........................................

@@ -6,8 +6,8 @@ Authors:
     Scott David (Utah State University)
     Brendan Murphy (Simon Fraser University)
 
-Version: 1.0
-Last Updated: 2025-04-10
+Version: 1.1
+Last Updated: 2025-12-01
 License: MIT License
 
 Description:
@@ -220,11 +220,11 @@ def main():
                 sg.popup_no_wait(sg_warning, title="Warning", text_color='black', background_color='white',
                                  button_color=('black', 'lightblue'))
 
-            # if minimum depth is not selected default the value to 0
+            # if minimum depth is not selected default the value to None
             if not min_depth_TF:
                 min_depth = None
 
-            # if minimum duration is not selected default the value to 0
+            # if minimum duration is not selected default the value to None
             if not min_duration_TF:
                 min_duration = None
 

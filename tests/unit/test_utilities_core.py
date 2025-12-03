@@ -107,7 +107,6 @@ def test_check_input_type(base_args, base_types):
     assert ok is False
 
 # ---------- validate_tip_type ----------
-
 def test_validate_tip_type_fixed_interval(fixed_input_file):
     path, sheet, tip_type, tip_size = fixed_input_file
     valid, inferred, series = su.validate_tip_type_from_raw_file(path, sheet if sheet else "", tip_type)
@@ -124,8 +123,7 @@ def test_validate_tip_type_cumulative(cumulative_input_file):
 
 @pytest.mark.parametrize("fixture_name, expected", [
     ("fixed_input_file", "Fixed Interval"),
-    ("cumulative_input_file", "Cumulative Tips"),
-])
+    ("cumulative_input_file", "Cumulative Tips"),])
 def test_tip_type_inference_smoke(request, fixture_name, expected):
     path, sheet, tip_type, tip_size = request.getfixturevalue(fixture_name)
     valid, inferred, series = su.validate_tip_type_from_raw_file(path, sheet or "", tip_type)

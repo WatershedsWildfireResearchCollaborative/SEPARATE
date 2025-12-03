@@ -119,6 +119,43 @@ def simple_tip_series():
 
 # Scrap code
 
+# ---------------------------------------------------------------------
+# Synthetic long dataset for ISC convergence
+# ---------------------------------------------------------------------
+
+@pytest.fixture(scope="session")
+def synthetic_isc_dataset_1():
+    """
+    Long synthetic tipping-bucket dataset for ISC convergence tests.
+
+    Expected location:
+        tests/data/SyntheticDataset1/Syn_Dataset.xlsx
+
+    The file should have two columns:
+        - DateTime
+        - TipDepth_mm   (unit ~ mm per tip, e.g., 0.2)
+
+    Returns
+    -------
+    tip_datetime : pd.Series
+        Timestamp for each tip.
+    tip_depth : np.ndarray
+        Tip depth values.
+    expected_mit_hours : float
+        Approximate "true" minimum inter-event time (hours) used in the
+        synthetic design (~6.0 hours).
+    """
+    path = ROOT / "tests" / "data" / "SyntheticDataset1" / "Syn_Dataset.xlsx"
+    df = pd.read_excel(path)
+
+    # First column is datetime, second is depth
+    tip_datetime = pd.to_datetime(df.iloc[:, 0])
+    tip_depth = df.iloc[:, 1].to_numpy()
+
+    expected_mit_hours = 6.0 # ~6 hours
+
+    return tip_datetime, tip_depth, expected_mit_hours
+
 
 # # Create synthetic datetime data with constant spacing
 # times = pd.date_range("2025-01-01", periods=10, freq="10min")
