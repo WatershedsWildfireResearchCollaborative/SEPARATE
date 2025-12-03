@@ -412,7 +412,7 @@ def main():
                         start_time_abs = storm_data[StormIDX]['start']
                         peakiD_all = []
 
-                        # # return the raw data
+                        # return the raw data
                         # cumulative time in hours
                         dataset_name = storm_id_name # set a dataset name for the dict
                         if tip_idx is not None and len(tip_idx) > 0:
@@ -534,7 +534,7 @@ def main():
                     output = pd.DataFrame(storm_record)
 
                     # rename fields for Excel/csv outputs
-                    # 2. Rename columns: # Note the separate outputs function requires these names
+                    # Rename columns: # Note the separate outputs function requires these names
                     output.rename(columns={
                         'start': 'Start',
                         'end': 'End',

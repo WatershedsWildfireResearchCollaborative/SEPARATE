@@ -62,3 +62,12 @@ def test_separate_storms_every_gap_exceeds_interval():
     # Interevent times are the gaps
     assert interevent_times.shape == (3,)
     assert np.allclose(interevent_times, [3.0, 3.0, 3.0])
+
+# ---------- repeating dates with no repeating dates ----------
+def test_rename_repeating_dates_no_repeats():
+    dates = ["2025-01-01", "2025-01-02"]
+    assert sf.rename_repeating_dates(dates) == ["2025-01-01", "2025-01-02"]
+
+# ---------- repeating dates with empty arrays ----------
+def test_rename_repeating_dates_empty():
+    assert sf.rename_repeating_dates([]) == []

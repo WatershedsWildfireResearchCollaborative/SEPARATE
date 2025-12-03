@@ -208,6 +208,26 @@ def test_separate_filter_removes_interior_storm_and_merges_IETs():
     assert filtered_iet.shape == (1,)
     assert pytest.approx(filtered_iet[0], rel=1e-6) == 3.0 + 5.5
 
+# ---------- test repeating renaming repeating dates ----------
+def test_rename_repeating_dates_basic():
+    dates = [
+        "2025-01-01",
+        "2025-01-01",
+        "2025-01-02",
+        "2025-01-01",
+        "2025-01-02",
+    ]
+
+    renamed = sf.rename_repeating_dates(dates)
+
+    assert renamed == [
+        "2025-01-01",
+        "2025-01-01_2",
+        "2025-01-02",
+        "2025-01-01_3",
+        "2025-01-02_2",
+    ]
+
 
 # ----------  ISC I/O smoke test ----------
 def test_separate_ISC_smoke(simple_tip_series, tmp_path, monkeypatch):
