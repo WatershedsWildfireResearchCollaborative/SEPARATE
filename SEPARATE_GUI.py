@@ -64,7 +64,7 @@ def main():
     disp_width = min(screen_width, 800) # limit to 800
     disp_height = int(screen_height * 1)  # 85% of the screen height
     # Create the window
-    window = sg.Window('SEPARATE v1.0', layout, resizable=resize, background_color=background_color,
+    window = sg.Window('SEPARATE v1.1', layout, resizable=resize, background_color=background_color,
                     size=(disp_width, disp_height), finalize=True)
 
     # adding in a min size for the window this is an attempt to fix the issue with the window being too small
@@ -75,7 +75,7 @@ def main():
     # software_metadata = ['SEPARATE - Summary Storm Event Output Table', 'Version 1.0 (03/01/2025)',
     #                      'License/Copyright Details', 'Requested reference: Murphy & David (2024), Journal, etc.',
     #                      'Published DOI', 'https://github.com/WatershedsWildfireResearchCollaborative/SEPARATE']
-    software_metadata = ['SEPARATE - Summary Storm Event Output Table', 'Version 1.0 (03/01/2025)',
+    software_metadata = ['SEPARATE - Summary Storm Event Output Table', 'Version 1.1 (12/01/2025)',
                         'Licensed under the MIT License.']
     # %% Running the GUI loop
     while True:
