@@ -1107,6 +1107,7 @@ def separate_outputs(output, storm_profiles, storm_raw_profiles, tip_units, I_in
     date_format = mdates.DateFormatter('%Y-%m-%d')  # Format as YYYY-MM-DD
     ax1.xaxis.set_major_formatter(date_format)
     ax1.tick_params(axis='x', labelrotation=90)
+    ax1.tick_params(axis='y', colors='blue')
     plt.subplots_adjust(bottom=0.3)  # Adjust the value as needed
     ax2.set_ylabel('Cumulative Rainfall, ' + tip_units, color='black')
     ax1.set_ylabel('Depth,' + tip_units, color='blue')
@@ -1129,6 +1130,7 @@ def separate_outputs(output, storm_profiles, storm_raw_profiles, tip_units, I_in
     date_format = mdates.DateFormatter('%Y-%m-%d')  # Format as YYYY-MM-DD
     ax1.xaxis.set_major_formatter(date_format)
     ax1.tick_params(axis='x', labelrotation=90)
+    ax1.tick_params(axis='y', colors='blue')
     plt.subplots_adjust(bottom=0.3)  # Adjust the value as needed
     ax2.set_ylabel(f'15-minute Intensity,  {tip_units}/hr', color='black')
     ax1.set_ylabel('Depth,' + tip_units, color='blue')
@@ -1233,6 +1235,7 @@ def separate_outputs(output, storm_profiles, storm_raw_profiles, tip_units, I_in
         date_format = mdates.DateFormatter('%Y-%m-%d')  # Format as YYYY-MM-DD
         ax1.xaxis.set_major_formatter(date_format)
         ax1.tick_params(axis='x', labelrotation=90)
+        ax1.tick_params(axis='y', colors='blue')
         plt.subplots_adjust(bottom=0.3)  # Adjust the value as needed
         ax2.set_ylabel('Cumulative Rainfall, ' + tip_units, color='black')
         ax1.set_ylabel('Depth,' + tip_units, color='blue')
@@ -1255,6 +1258,7 @@ def separate_outputs(output, storm_profiles, storm_raw_profiles, tip_units, I_in
         date_format = mdates.DateFormatter('%Y-%m-%d')  # Format as YYYY-MM-DD
         ax1.xaxis.set_major_formatter(date_format)
         ax1.tick_params(axis='x', labelrotation=90)
+        ax1.tick_params(axis='y', colors='blue')
         plt.subplots_adjust(bottom=0.3)  # Adjust the value as needed
         ax2.set_ylabel(f'15-minute Intensity,  {tip_units}/hr', color='black')
         ax1.set_ylabel('Depth,' + tip_units, color='blue')
