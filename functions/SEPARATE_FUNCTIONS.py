@@ -1134,7 +1134,7 @@ def separate_outputs(output, storm_profiles, storm_raw_profiles, tip_units, I_in
     ax1.set_ylabel('Depth,' + tip_units, color='blue')
     fig_title = (f'{output_name}: {start_date} - {end_date}')
     plt.title(fig_title, fontsize=14)
-    sum_plot_name3 = f"{output_name}_magnitude_rainfall_intensity_full{plt_ext}"
+    sum_plot_name3 = f"{output_name}_depth_rainfall_intensity_full{plt_ext}"
     sum_plot_path3 = os.path.join(output_path, sum_plot_name3)
     plt.savefig(sum_plot_path3)
 
@@ -1238,7 +1238,7 @@ def separate_outputs(output, storm_profiles, storm_raw_profiles, tip_units, I_in
         ax1.set_ylabel('Depth,' + tip_units, color='blue')
         fig_title = (f'{output_name}: {start_date} - {end_date}')
         plt.title(fig_title, fontsize=14)
-        sum_plot_name2 = f"{output_name}_magnitude_cumulative_rainfall_sub{plt_ext}"
+        sum_plot_name2 = f"{output_name}_depth_cumulative_rainfall_sub{plt_ext}"
         sum_plot_path2 = os.path.join(output_path, sum_plot_name2)
         plt.savefig(sum_plot_path2)
 
@@ -1260,7 +1260,7 @@ def separate_outputs(output, storm_profiles, storm_raw_profiles, tip_units, I_in
         ax1.set_ylabel('Depth,' + tip_units, color='blue')
         fig_title = (f'{output_name}: {start_date} - {end_date}')
         plt.title(fig_title, fontsize=14)
-        sum_plot_name3 = f"{output_name}_magnitude_rainfall_intensity_sub{plt_ext}"
+        sum_plot_name3 = f"{output_name}_depth_rainfall_intensity_sub{plt_ext}"
         sum_plot_path3 = os.path.join(output_path, sum_plot_name3)
         plt.savefig(sum_plot_path3)
 
