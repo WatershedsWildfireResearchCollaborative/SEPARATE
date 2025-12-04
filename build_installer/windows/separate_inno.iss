@@ -2,9 +2,9 @@
 ; SEE THE DOCUMENTATION FOR DETAILS ON CREATING INNO SETUP SCRIPT FILES!
 
 #define MyAppName "SEPARATE"
-#define MyAppVersion "1.0"
+#define MyAppVersion "1.1"
 #define MyAppPublisher "Murphy Watershed Science Lab"
-#define MyAppURL "https://www.burnedwatersheds.ca/"
+#define MyAppURL "https://www.burnedwatersheds.com"
 #define MyAppExeName "SEPARATE.exe"
 
 [Setup]
@@ -17,11 +17,11 @@ AppSupportURL={#MyAppURL}
 AppUpdatesURL={#MyAppURL}
 DefaultDirName={autopf}\{#MyAppName}
 DisableProgramGroupPage=yes
-LicenseFile=D:\GitHub\WWRC\SEPARATE_Compiled\LICENSE.txt
-OutputDir=D:\GitHub\WWRC\SEPARATE_Compiled\
+LicenseFile=D:\GitHub\WWRC\SEPARATE_installers\win\LICENSE.txt
+OutputDir=D:\GitHub\WWRC\SEPARATE_installers\
 OutputBaseFilename=SEPARATE_setup
-SetupIconFile=D:\GitHub\WWRC\SEPARATE_Compiled\dist\SEPARATE\images\icon.ico
-UninstallDisplayIcon={app}\SEPARATE.exe**
+SetupIconFile=D:\GitHub\WWRC\SEPARATE_installers\win\images\icon.ico
+UninstallDisplayIcon={app}\SEPARATE.exe
 Compression=lzma
 SolidCompression=yes
 WizardStyle=modern
@@ -34,7 +34,7 @@ Name: "desktopicon"; Description: "{cm:CreateDesktopIcon}"; GroupDescription: "{
 
 [Files]
 ; Copy the entire unpacked folder contents
-Source: "D:\GitHub\WWRC\SEPARATE_Compiled\dist\SEPARATE\*"; DestDir: "{app}"; Flags: ignoreversion recursesubdirs createallsubdirs
+Source: "D:\GitHub\WWRC\SEPARATE_installers\win\dist\SEPARATE\*"; DestDir: "{app}"; Flags: ignoreversion recursesubdirs createallsubdirs
 
 [Icons]
 Name: "{autoprograms}\{#MyAppName}"; Filename: "{app}\{#MyAppExeName}"
