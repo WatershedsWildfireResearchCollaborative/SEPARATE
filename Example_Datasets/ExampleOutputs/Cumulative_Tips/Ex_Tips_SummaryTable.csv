@@ -16,7 +16,7 @@ Number of Storms Suppressed:,4
 Minimum Storm Depth (mm):,0.2
 Minimum Storm Duration (hrs):,0.2
 Record Separated On:,2025-12-04
-Data Input File:,C:/Users/Scott/Desktop/ExampleOutputs/ExampleData_CumulativeTips.csv
+Data Input File:,C:/Users/Scott/Desktop/Example_Datasets/ExampleData_CumulativeTips.csv
 
 StormID,Start,End,Duration,Depth,Average_Intensity,Peak_i5,Peak_i10,Peak_i15,Peak_i30,Peak_i60,Peak_i5_time,Peak_i10_time,Peak_i15_time,Peak_i30_time,Peak_i60_time
 Unique Identifier,date_time,date_time,hours,mm,mm/hr,mm/hr,mm/hr,mm/hr,mm/hr,mm/hr,date_time,date_time,date_time,date_time,date_time

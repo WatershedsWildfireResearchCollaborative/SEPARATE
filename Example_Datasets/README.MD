@@ -11,13 +11,16 @@ To help users get started quickly, we include two example datasets:
 | `ExampleData_FixedInterval.csv`    | Example dataset logged at regular intervals using fixed time steps.      |
 | `ExampleData_CumulativeTips.xlsx`   | Example dataset with cumulative tip logging style (e.g., HOBO loggers).  |
 
+***Note:*** The file-selection window defaults to showing only Excel files. If you are loading a .csv example dataset, change the file-type dropdown from Excel Files to CSV Files so the file is visible.
+
+
 Each file contains two columns:
 1. **Timestamp** in the format `MM/DD/YY HH:MM:SS`
 2. **Rainfall Value** — either:
    - Cumulative tip count (`Cumulative Tips` format), or
    - Rainfall per interval (`Fixed Interval` format)
 
-Both files are preformatted to match SEPARATE’s input requirements. You can use them to test the interface, explore SEPARATE’s options, or verify that your installation is working correctly. For more information about rain gauge data types, GUI parameter selection, and underlying data processing methods, see the [Supplement](../supplementary/Supplementary_Information.pdf) or our detailed [Instruction Manual](../SEPARATE-User-Manual-Version1.0.pdf).
+Both files are preformatted to match SEPARATE's input requirements. You can use them to test the interface, explore SEPARATE's options, or verify that your installation is working correctly. For more information about rain gauge data types, GUI parameter selection, and underlying data processing methods, see the [Supplement](../supplementary/Supplementary_Information.pdf) or our detailed [Instruction Manual](../SEPARATE-User-Manual-Version1.0.pdf).
 
 The [`ExampleOutputs`](./ExampleOutputs) folder contains results from running both datasets (named accordingly) using a 15-minute duration storm intensity for plotting.
 
