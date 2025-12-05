@@ -8,7 +8,7 @@
 To help users get started quickly, we include two example datasets:
 | Filename                             | Description                                                                 |
 |--------------------------------------|-----------------------------------------------------------------------------|
-| `ExampleData_FixedInterval.xlsx`    | Example dataset logged at regular intervals using fixed time steps.      |
+| `ExampleData_FixedInterval.csv`    | Example dataset logged at regular intervals using fixed time steps.      |
 | `ExampleData_CumulativeTips.xlsx`   | Example dataset with cumulative tip logging style (e.g., HOBO loggers).  |
 
 Each file contains two columns:

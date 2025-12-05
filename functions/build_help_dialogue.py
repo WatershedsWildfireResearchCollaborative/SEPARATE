@@ -45,6 +45,7 @@ If Statistically Independent Storms criterion is selected, set the maximum inter
 
 """
 
+# Note regarding helpmsg7 this functionality is not currently included but is in development for future releases
     helpmsg7 = """
 Conditional - Required 
 
@@ -65,38 +66,42 @@ Users can suppress any storm events with either a total rainfall depth or durati
 For UDM and MDTT criterion, this will not influence analysis, but suppressed storms will not be included in the output summary table or storm profile analysis (if selected). For SIS criterion, additional criteria will influence calculations of the mean and standard deviation of inter-event time and potentially affect the identified fixed MIT value.
 
 See SEPARATE manual for more details.
-
 """
 
     helpmsg9 = """
 *Required
 
-Enter an identifying name for the output results. This name will be used for the outputs folder as well as the prefix for all  
+Select or create a folder where SEPARATE will save all output files for this run. 
 """
 
     helpmsg10 = """
-Optional
+*Required
 
-SEPARATE outputs include a timeseries plot of events displaying both the magnitude of individual events and the cumulative rainfall over the rainfall record. Enter an alternate start date, end date, or both (within the timeframe of the rainfall record) to adjust the x-axis range of displayed events and associated cumulative rainfall. Dates must be entered using the format: YYYY-MM-DD.
+Enter an identifying name for the output results. This name will be used for all file names and sub-folders. 
+Output tables will be written in .xlsx or .csv format depending on the format of the input dataset.
 """
 
     helpmsg11 = """
 Optional
 
+SEPARATE outputs include a timeseries plot of events displaying both the magnitude of individual events and the cumulative rainfall over the rainfall record. Enter an alternate start date, end date, or both (within the timeframe of the rainfall record) to adjust the x-axis range of displayed events and associated cumulative rainfall. Dates must be entered using the format: YYYY-MM-DD.
+"""
+
+    helpmsg12 = """
+Optional
+
 Tabular and graphical profiles of the cumulative rainfall and rainfall intensity through each storm can be optionally included as outputs.
  
-For tabular outputs – data tables for each storm will be included in the output summary Excel file as separate sheets (or “tabs”) named according to their storm ID (found in the summary event table).
+For tabular outputs – cumulative rainfall profiles and rainfall intensity profiles for all storms are written to additional
+tabs in the output Excel or CSV files.
 
 For graphical outputs – annotated storm profile plots for each storm will be saved as image files in a subfolder within the output directory. Image files are named based on the associated storm ID.
+
+If either tabular or graphical event profile options are selected, users must select the interval over which rainfall intensity will be calculated and plotted over the course of each storm event. Options include standard sub-hourly to hourly intervals of 5-, 10-, 15-, 30-, and 60-minutes.
 
 See SEPARATE manual for more details.
 """
 
-    helpmsg12 = """
-Conditional - Required
-
-If either tabular or graphical event profile options are selected, then users must select the interval over which rainfall intensity will be calculated and plotted over the course of each storm event. Options include standard sub-hourly to hourly intervals of 5-, 10-, 15-, 30-, and 60-minutes.
-"""
 
     # compile the help messages into a single structure
     help_messages = {

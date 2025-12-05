@@ -6,8 +6,8 @@ Authors:
     Scott David (Utah State University)
     Brendan Murphy (Simon Fraser University)
 
-Version: 1.0
-Last Updated: 2025-04-10
+Version: 1.1
+Last Updated: 2025-12-01
 License: MIT License
 
 Description:
@@ -64,7 +64,7 @@ def main():
     disp_width = min(screen_width, 800) # limit to 800
     disp_height = int(screen_height * 1)  # 85% of the screen height
     # Create the window
-    window = sg.Window('SEPARATE v1.0', layout, resizable=resize, background_color=background_color,
+    window = sg.Window('SEPARATE v1.1', layout, resizable=resize, background_color=background_color,
                     size=(disp_width, disp_height), finalize=True)
 
     # adding in a min size for the window this is an attempt to fix the issue with the window being too small
@@ -75,7 +75,7 @@ def main():
     # software_metadata = ['SEPARATE - Summary Storm Event Output Table', 'Version 1.0 (03/01/2025)',
     #                      'License/Copyright Details', 'Requested reference: Murphy & David (2024), Journal, etc.',
     #                      'Published DOI', 'https://github.com/WatershedsWildfireResearchCollaborative/SEPARATE']
-    software_metadata = ['SEPARATE - Summary Storm Event Output Table', 'Version 1.0 (03/01/2025)',
+    software_metadata = ['SEPARATE - Summary Storm Event Output Table', 'Version 1.1 (12/01/2025)',
                         'Licensed under the MIT License.']
     # %% Running the GUI loop
     while True:
@@ -216,14 +216,15 @@ def main():
 
             else:
                 storm_gap_type = 'ISC'
-                print('Storm gap type not valid. Defaulting to Statistically Independent Storms')
-                # print('Turn this into a warning message')
+                sg_warning = 'Storm gap type not valid. Defaulting to Statistically Independent Storms'
+                sg.popup_no_wait(sg_warning, title="Warning", text_color='black', background_color='white',
+                                 button_color=('black', 'lightblue'))
 
-            # if minimum depth is not selected default the value to 0
+            # if minimum depth is not selected default the value to None
             if not min_depth_TF:
                 min_depth = None
 
-            # if minimum duration is not selected default the value to 0
+            # if minimum duration is not selected default the value to None
             if not min_duration_TF:
                 min_duration = None
 
@@ -270,6 +271,10 @@ def main():
 
             #  ................................Execute SEPARATE algorithm...........................................
             if tf_type and tf_fields and tf_date:
+                # check input file type
+                _, input_ext = os.path.splitext(filename)
+                input_ext = input_ext.lower()
+
                 try:
                     errmsg = None
 
@@ -318,7 +323,6 @@ def main():
                         if not os.path.exists(gap_plots_path):
                             os.makedirs(gap_plots_path, exist_ok=True)
 
-                        # compute storm gap using optimized method
                         Fixed_MIT, mean_tb, CV_IET, mean_IET, std_IET, ISC_testintervals, StormNumsRec = sf.separate_ISC(
                             tip_datetime, tip_depth, isc_t_max, min_depth, min_duration,
                             gap_plots_path, output_name, plt_ext)
@@ -405,9 +409,19 @@ def main():
                                                                                                             tip_datetime,
                                                                                                             tip_depth,
                                                                                                             plot_int)
-
                         start_time_abs = storm_data[StormIDX]['start']
                         peakiD_all = []
+
+                        # return the raw data
+                        # cumulative time in hours
+                        dataset_name = storm_id_name # set a dataset name for the dict
+                        if tip_idx is not None and len(tip_idx) > 0:
+                            cumulative_time_hours = ((tip_datetime[tip_idx] - tip_datetime[tip_idx].iloc[0]).dt.total_seconds()/ 3600.0)
+                            storm_raw_profiles[dataset_name] = {f'TBRG Time Stamp': tip_datetime[tip_idx],  # win_range,
+                                                                f'Cumulative Storm Time (hours)':
+                                                                    np.round(cumulative_time_hours, 2),  # win_range,
+                                                                f'Cumulative Rainfall ({tip_units})':
+                                                                    np.round(cum_rain,2)}
 
                         for interval in I_intervals * 60:  # Convert hours back to minutes for intensity intervals
                             # calculate the peak intensity
@@ -417,29 +431,22 @@ def main():
 
                             # optionally log the storm profile data
                             if data_opt and plot_int == interval and ~np.isnan(peakiDs[1]):
-                                # cumulative time in hours
-                                cumulative_time_hours = (tip_datetime[tip_idx] - tip_datetime[tip_idx].iloc[
-                                    0]).dt.total_seconds() / 3600.0
                                 peak_dt_str = peakiDs[2].strftime('%Y-%m-%d %H:%M:%S')
                                 # store the profile storm profile data
-                                dataset_name = storm_id_name
                                 storm_meta_data = {f'Storm ID:': f'{storm_id_name}',
                                                 f'Start Date & Time:': f'{start_time_abs}',
                                                 f'Storm Duration (hrs):': f'{np.round(duration_min / 60, 2)}',
-                                                f'Storm Magnitude ({tip_units}):': f'{np.round(len(tip_idx) * tip_mag, 2)}',
+                                                f'Depth ({tip_units}):': f'{np.round(len(tip_idx) * tip_mag, 2)}',
                                                 f'Peak {int(interval)}-min Intensity ({tip_units}/hr):': f'{round(peakiDs[1], 2)}',
                                                 f'Peak Intensity Date and Time:': f'{peak_dt_str}',
                                                 f'Number of Tips': f'{len(tip_idx)}'}
 
-                                storm_profiles[dataset_name] = {f'Cumulative Storm Time (hours)': np.round(iD_time/60,2),
+                                storm_profiles[dataset_name] = {f'Cumulative Storm Time (hours)': np.array([round(x, 4) for x in iD_time / 60]),
+                                                                # f'Cumulative Storm Time (hours)': np.round(iD_time / 60,4),
                                                                 # interpolated time range since start of storm
                                                                 f'{plot_int}-min Intensity ({tip_units}/hr)': np.round(iD_Mag,2),
                                                                 f'Storm Metadata': storm_meta_data}
-                                # # return the raw data
-                                storm_raw_profiles[dataset_name] = {f'TBRG Time Stamp': tip_datetime[tip_idx],  # win_range,
-                                                                    f'Cumulative Storm Time (hours)': np.round(
-                                                                        cumulative_time_hours, 2),  # win_range,
-                                                                    f'Cumulative Rainfall ({tip_units})': cum_rain}
+
 
                             # optionally plot the storm profile and peak intensity
                             if plot_opt and plot_int == interval and ~np.isnan(peakiDs[1]):
@@ -447,7 +454,7 @@ def main():
                                 fig_title = (f'{output_name}\n'
                                             f'Storm ID:{storm_id_name}\n'  # int(storms_in[i])
                                             f'Start Date & Time: {start_time_abs}\n'
-                                            f'Storm Magnitude ({tip_units}): {np.round(len(tip_idx) * tip_mag, 2)}\n'
+                                            f'Depth ({tip_units}): {np.round(len(tip_idx) * tip_mag, 2)}\n'
                                             f'Peak {int(interval)}-min Intensity ({tip_units}/hr): {round(peakiDs[1], 2)}\n'
                                             f'Peak Intensity Date and Time:{peak_dt_str}\n'
                                             )
@@ -521,25 +528,25 @@ def main():
                         # output the fitting parameters
                         sf.output_fitting_parameters_to_file(software_metadata, header_parameters, CV_IET, mean_IET,
                                                             std_IET,ISC_testintervals, StormNumsRec,
-                                                            output_name, gap_plots_path)
+                                                            output_name, gap_plots_path, input_ext)
 
                     # build output dataframe
                     output = pd.DataFrame(storm_record)
 
-                    # rename fields for excel outputs
-                    # 2. Rename columns:
+                    # rename fields for Excel/csv outputs
+                    # Rename columns: # Note the separate outputs function requires these names
                     output.rename(columns={
                         'start': 'Start',
                         'end': 'End',
                         'duration': 'Duration',
-                        'magnitude': 'Magnitude',
-                        'intensity_avg': 'Storm_Intensity',
+                        'magnitude': 'Depth',
+                        'intensity_avg': 'Average_Intensity',
                     }, inplace=True)
 
 
                     # Define columns for the summary table.
                     # Basic storm data plus peak intensities for each intensity interval.
-                    columns = ['StormID', 'Start', 'End', 'Duration', 'Magnitude', 'Storm_Intensity'] + \
+                    columns = ['StormID', 'Start', 'End', 'Duration', 'Depth', 'Average_Intensity'] + \
                             [f'Peak_i{int(60 * I_int)}' for I_int in I_intervals] + \
                             [f'Peak_i{int(60 * I_int)}_time' for I_int in I_intervals]
 
@@ -564,7 +571,7 @@ def main():
                     errmsg = sf.separate_outputs(output, storm_profiles, storm_raw_profiles, tip_units,
                                                 I_intervals, data_opt, header_parameters, output_path,
                                                 output_name, plot_int, plt_ext, plot_start_date, plot_end_date,
-                                                software_metadata, columns, units)
+                                                software_metadata, columns, units, input_ext)
 
                     # update progress bar
                     print('complete')

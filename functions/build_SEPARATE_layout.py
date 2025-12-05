@@ -175,6 +175,7 @@ def build_SEPARATE_layout():
         #4
         [sg.Text("Maximum Inter-event Test Interval",background_color=background_color, font=label_font,
                          text_color=header_color, size=(35, 1), pad=pad2)],
+
         #5
         # [
         # sg.Button(image_filename=info_button, button_color=('white', 'white'), border_width=0, key='info7',pad=pad1),

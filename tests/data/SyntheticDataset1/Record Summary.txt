@@ -1,0 +1,18 @@
+------------- Record Summary -------------
+
+_______________ Defined _________________
+
+Number of Storms:                    200
+Min. Inter-event Time (hr):          6.0
+Mean Inter-event Time (hr):          54.0
+Min. Storm Duration (min):           20
+
+______________ Empirical ________________
+
+Min. Inter-event Time (hr):          6.13
+Mean Excess Inter-event Time (hr):   62.63
+S.D. Excess Inter-event Time (hr):   69.01
+Excess Coefficient of Variation:     1.10
+Mean Raw Inter-event Time (hr):      68.75
+S.D. Raw Inter-event Time (hr):      69.01
+Raw Coefficient of Variation:        1.00

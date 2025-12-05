@@ -1,3 +1,4 @@
+
 # 🛠 Building and Packaging SEPARATE on macOS
 
 This guide documents the full process for setting up the SEPARATE GUI tool on a clean Mac system, bundling it into a `.app`, and packaging it as a `.dmg` installer.
@@ -15,6 +16,8 @@ This guide documents the full process for setting up the SEPARATE GUI tool on a 
    ```bash
    brew install python@3.11
    ```
+
+   Note: SEPARATE must be built with Python 3.11 due to a known SciPy / PyInstaller compatibility issue with Python 3.12.
 
 3. **Install tkinter support** (required, not bundled with Homebrew Python):
    ```bash
@@ -48,25 +51,26 @@ If the app opens and runs successfully, you're ready to bundle it.
 ---
 
 ## Build `.app` with PyInstaller
+### If building from current spec file:
+1. **Run spec file with pyinstaller**
+```bash
+pyinstaller SEPARATE_GUI.spec
+```
 
-1. **Install PyInstaller:**
-   ```bash
-   pip install pyinstaller
-   ```
-
-2. **Generate a spec file:**
+### If building from scratch 
+1. **Generate a spec file:**
    ```bash
    pyi-makespec --windowed --icon=images/icon.icns SEPARATE_GUI.py
    ```
 
-3. **Edit the `.spec` file:** 
+2. **Edit the `.spec` file:** 
    [or copy the separate_mac.spec file contents into the new spec file]
    - Add the `images/` and `functions/` folders to `datas`
    - Add `matplotlib` backends and `functions` submodules to `hiddenimports`
    - Add a `BUNDLE(...)` section at the bottom
    - Use `Path(".").resolve()` instead of `__file__`
 
-4. **Build the app:**
+3. **Build the app:**
    ```bash
    pyinstaller SEPARATE_GUI.spec
    ```

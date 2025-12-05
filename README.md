@@ -7,13 +7,13 @@
 ## Overview
 **Storm Event Partitioning And Rainfall Analytics for Tipping-bucket rain gauge data Evaluation (SEPARATE)**
 
-SEPARATE is an open-source, GUI-based software package that provides users with a fast, reliable, and automated method to post-process tipping bucket rain gauge (TBRG) data. It enables the identification and partitioning of independent storm events and calculates key rainfall metrics like storm duration, magnitude, and intensity. SEPARATE supports both user-defined and statistical (independent storm criterion) approaches to event separation, while offering a range of tabular and graphical output options.
+SEPARATE is an open-source, GUI-based software package that provides users with a fast, reliable, and automated method to post-process tipping bucket rain gauge (TBRG) data. It enables the identification and partitioning of independent storm events and calculates key rainfall metrics like storm duration, depth, and intensity. SEPARATE supports both user-defined and statistical (independent storm criterion) approaches to event separation, while offering a range of tabular and graphical output options.
 
 The software is distributed both as:
 - A **standalone desktop application** (no Python installation needed)
 - A **source code version** with environment files for Python users
 
- SEPARATE was developed using PySimpleGUI, compiled into a standalone executable with PyInstaller, and packaged using Inno Setup for distribution.
+SEPARATE was developed using PySimpleGUI and compiled into standalone applications with PyInstaller. The Windows installer is packaged using Inno Setup, while the macOS distribution is created using the create-dmg tool (installed via Homebrew).
 
 ## Download & Installation
 
@@ -37,7 +37,7 @@ Precompiled installers are available for both **Windows** and **macOS**, and inc
 
 3. Launch SEPARATE to begin.
 
-> ⚠️ **macOS note:** The application is not code-signed. You may need to bypass Gatekeeper the first time you run it (e.g., right-click → Open).  
+> ⚠️ **macOS note:** The macOS application is not code-signed. You may need to bypass Gatekeeper the first time you run it (e.g., right-click → Open).  
 > ⚠️ **Windows note:** Some antivirus software (including Windows Defender) may warn about unsigned installers. If you downloaded SEPARATE from our official link, you can safely ignore the warning and proceed with installation.
 
 
@@ -68,7 +68,7 @@ If you prefer to run the Python source code, you can use either a **Conda enviro
 
 #### Option 2B: Using pip + venv
 
-> ⚠️ **Python 3.12 recommended (3.10 - 3.12 supported)**  
+> ⚠️ **Python 3.11 recommended (3.10 - 3.12 supported)**  
 > Python 3.13 is **not yet supported** due to dependency incompatibilities.
 
 1. Clone or download the repository.
@@ -158,40 +158,10 @@ To help users get started quickly, we include two example rainfall datasets in t
 
 Murphy & David, JOSS, 2025, submitted
 
-## License Information 
-MIT License
-
-Copyright (c) 2025 Brendan P. Murphy & Scott R. David
-
-Permission is hereby granted, free of charge, to any person obtaining a copy
-of this software and associated documentation files (the "Software"), to deal
-in the Software without restriction, including without limitation the rights
-to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
-copies of the Software, and to permit persons to whom the Software is
-furnished to do so, subject to the following conditions:
-
-The above copyright notice and this permission notice shall be included in all
-copies or substantial portions of the Software.
-
-THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
-IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
-FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
-AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
-LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
-OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
-SOFTWARE.
 
 ## Legal Disclaimer
 
 SEPARATE is an open-source software package developed by the Murphy Watershed Science Lab to assist with rainfall data processing and storm event analysis. It is distributed in the hope that it will be useful for research, education, and resource management, but **without any warranty**.
 
 The developers make no claims regarding the accuracy, completeness, or performance of the software. Users are solely responsible for any results generated and should independently validate outputs before applying them to engineering, policy, or hazard assessment decisions.
-
-### Contributions & Feedback
-We welcome suggestions, improvements, and feedback to help improve SEPARATE.
-
-If you are considering a significant code contribution, we encourage you to contact the developers first. This helps avoid duplicate efforts and ensures alignment with the project’s goals.
-
-For smaller contributions or bug reports, feel free to create an issue or fork the repository and submit a pull request. All contributions are welcome.
-
 
