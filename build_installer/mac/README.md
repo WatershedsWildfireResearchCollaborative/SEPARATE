@@ -1,5 +1,5 @@
 
-# 🛠 Building and Packaging SEPARATE on macOS
+# Building and Packaging SEPARATE on macOS
 
 This guide documents the full process for setting up the SEPARATE GUI tool on a clean Mac system, bundling it into a `.app`, and packaging it as a `.dmg` installer.
 
