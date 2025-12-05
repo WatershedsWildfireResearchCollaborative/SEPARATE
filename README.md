@@ -28,8 +28,8 @@ Precompiled installers are available for both **Windows** and **macOS**, and inc
 **Steps:**
 
 1. Download the appropriate installer for your operating system [here](https://usu.box.com/v/SEPARATE-download):
-   - `SEPARATE_Windows.exe` for **Windows**  
-   - `SEPARATE_macOS.dmg` for **macOS**
+   - `SEPARATE_Win_setup_v1_1.exe` for **Windows**  
+   - `SEPARATE_macOS_setup_v1_1.dmg` for **macOS**
 
 2. Run the installer:
    - On **Windows**, double-click `SEPARATE_Windows.exe` and follow the prompts.
