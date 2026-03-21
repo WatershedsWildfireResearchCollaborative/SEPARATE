@@ -27,7 +27,7 @@ Precompiled installers are available for both **Windows** and **macOS**, and inc
 
 **Steps:**
 
-1. Download the appropriate installer for your operating system [here]([https://usu.box.com/v/SEPARATE-download](https://github.com/WatershedsWildfireResearchCollaborative/SEPARATE/releases/tag/V1.1.0)):
+1. Download the appropriate installer for your operating system [here](https://github.com/WatershedsWildfireResearchCollaborative/SEPARATE/releases/tag/V1.1.0):
    - `SEPARATE_Win_setup_v1_1.exe` for **Windows**  
    - `SEPARATE_macOS_setup_v1_1.dmg` for **macOS**
 
