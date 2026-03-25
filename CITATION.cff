@@ -1,0 +1,38 @@
+cff-version: "1.2.0"
+authors:
+- family-names: Murphy
+  given-names: Brendan P.
+  orcid: "https://orcid.org/0000-0001-8025-1253"
+- family-names: David
+  given-names: Scott R.
+  orcid: "https://orcid.org/0000-0003-2708-4251"
+contact:
+- family-names: Murphy
+  given-names: Brendan P.
+  orcid: "https://orcid.org/0000-0001-8025-1253"
+doi: 10.5281/zenodo.19141362
+message: If you use this software, please cite our article in the
+  Journal of Open Source Software.
+preferred-citation:
+  authors:
+  - family-names: Murphy
+    given-names: Brendan P.
+    orcid: "https://orcid.org/0000-0001-8025-1253"
+  - family-names: David
+    given-names: Scott R.
+    orcid: "https://orcid.org/0000-0003-2708-4251"
+  date-published: 2026-03-25
+  doi: 10.21105/joss.08851
+  issn: 2475-9066
+  issue: 119
+  journal: Journal of Open Source Software
+  publisher:
+    name: Open Journals
+  start: 8851
+  title: "SEPARATE: Storm Event Partitioning And Rainfall Analytics for
+    Tipping-bucket rain gauge data Evaluation"
+  type: article
+  url: "https://joss.theoj.org/papers/10.21105/joss.08851"
+  volume: 11
+title: "SEPARATE: Storm Event Partitioning And Rainfall Analytics for
+  Tipping-bucket rain gauge data Evaluation"
