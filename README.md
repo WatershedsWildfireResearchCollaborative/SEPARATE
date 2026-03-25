@@ -151,8 +151,8 @@ Notes
 ## Documentation
 
 - [User Manual (PDF)](SEPARATE-User-Manual-Version1.0.pdf)
-- [Manuscript (JOSS submission)](paper/paper.md)
-- Supplementary Material in `supplementary/`
+- [JOSS Publication)](paper/10.21105.joss.08851.pdf)
+- [Supplementary Material](paper/supplementary)
 
 ## Example Datasets
 
