@@ -152,7 +152,7 @@ Notes
 
 - [User Manual (PDF)](SEPARATE-User-Manual-Version1.0.pdf)
 - [JOSS Publication)](paper/10.21105.joss.08851.pdf)
-- [Supplementary Material](paper/supplementary)
+- [Supplementary Material](paper/SEPARATE_USER_MANUAL_V1_1_0.pdf)
 
 ## Example Datasets
 
