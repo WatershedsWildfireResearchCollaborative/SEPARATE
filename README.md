@@ -156,7 +156,8 @@ To help users get started quickly, we include two example rainfall datasets in t
 
 ## Recommended Citation
 
-Murphy & David, JOSS, 2025, submitted
+Murphy, & David. (2026). SEPARATE: Storm Event Partitioning And Rainfall Analytics for Tipping-bucket rain gauge data Evaluation. Journal
+of Open Source Software, 11(119), 8851. https://doi.org/10.21105/joss.08851.
 
 
 ## Legal Disclaimer
