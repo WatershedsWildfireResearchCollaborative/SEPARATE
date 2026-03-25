@@ -15,6 +15,11 @@ The software is distributed both as:
 
 SEPARATE was developed using PySimpleGUI and compiled into standalone applications with PyInstaller. The Windows installer is packaged using Inno Setup, while the macOS distribution is created using the create-dmg tool (installed via Homebrew).
 
+## Recommended Citation
+
+Murphy, & David. (2026). SEPARATE: Storm Event Partitioning And Rainfall Analytics for Tipping-bucket rain gauge data Evaluation. Journal
+of Open Source Software, 11(119), 8851. https://doi.org/10.21105/joss.08851.
+
 ## Download & Installation
 
 SEPARATE can be used in three ways:
@@ -152,12 +157,6 @@ Notes
 ## Example Datasets
 
 To help users get started quickly, we include two example rainfall datasets in the [`Example_Datasets`](Example_Datasets/) folder. Each includes instructions and pre-run outputs demonstrating how SEPARATE handles different rain gauge formats.
-
-
-## Recommended Citation
-
-Murphy, & David. (2026). SEPARATE: Storm Event Partitioning And Rainfall Analytics for Tipping-bucket rain gauge data Evaluation. Journal
-of Open Source Software, 11(119), 8851. https://doi.org/10.21105/joss.08851.
 
 
 ## Legal Disclaimer
