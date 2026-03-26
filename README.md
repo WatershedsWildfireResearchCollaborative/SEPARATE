@@ -150,9 +150,9 @@ Notes
 ---
 ## Documentation
 
-- [User Manual (PDF)](SEPARATE-User-Manual-Version1.0.pdf)
-- [JOSS Publication)](paper/10.21105.joss.08851.pdf)
-- [Supplementary Material](paper/SEPARATE_USER_MANUAL_V1_1_0.pdf)
+- [User Manual (PDF)](documents/SEPARATE-User-Manual-Version1.0.pdf)
+- [JOSS Publication)](documents/10.21105.joss.08851.pdf)
+- [Supplementary Material](documents/SEPARATE_USER_MANUAL_V1_1_0.pdf)
 
 ## Example Datasets
 
